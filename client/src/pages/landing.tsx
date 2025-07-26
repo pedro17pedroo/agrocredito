@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "wouter";
-import { Sprout, Calculator, Shield, Clock, Smartphone } from "lucide-react";
+import { Sprout, Calculator, Shield, Clock, Smartphone, UserPlus, FileText, CheckCircle, CreditCard, ArrowRight } from "lucide-react";
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 import LoginForm from "@/components/auth/login-form";
@@ -128,6 +128,300 @@ export default function Landing() {
                 Dados protegidos com criptografia avançada. 
                 Autenticação robusta e transações seguras.
               </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How It Works Section */}
+      <section id="features" className="py-20 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-agri-dark mb-4">
+              Como Funciona o AgroCrédito
+            </h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Em 4 passos simples, obtém o crédito para o seu projeto agrícola. 
+              Processo 100% digital e pensado para agricultores angolanos.
+            </p>
+          </div>
+
+          {/* Process Steps */}
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
+            <div className="text-center">
+              <div className="relative">
+                <div className="bg-agri-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <UserPlus className="text-white w-10 h-10" />
+                </div>
+                <div className="absolute -top-2 -right-2 bg-agri-accent text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                  1
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-agri-dark mb-3">Registar-se</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Crie a sua conta com o seu BI, telemóvel e dados básicos. 
+                Processo rápido e seguro.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="relative">
+                <div className="bg-agri-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <Calculator className="text-white w-10 h-10" />
+                </div>
+                <div className="absolute -top-2 -right-2 bg-agri-accent text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                  2
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-agri-dark mb-3">Simular</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Use o simulador para calcular prestações, juros e 
+                encontrar as melhores condições.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="relative">
+                <div className="bg-agri-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <FileText className="text-white w-10 h-10" />
+                </div>
+                <div className="absolute -top-2 -right-2 bg-agri-accent text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                  3
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-agri-dark mb-3">Solicitar</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Preencha o formulário com detalhes do seu projeto agrícola. 
+                Análise automática e rápida.
+              </p>
+            </div>
+
+            <div className="text-center">
+              <div className="relative">
+                <div className="bg-agri-primary rounded-full w-20 h-20 flex items-center justify-center mx-auto mb-6 shadow-lg">
+                  <CheckCircle className="text-white w-10 h-10" />
+                </div>
+                <div className="absolute -top-2 -right-2 bg-agri-accent text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
+                  4
+                </div>
+              </div>
+              <h3 className="text-xl font-bold text-agri-dark mb-3">Receber</h3>
+              <p className="text-gray-600 leading-relaxed">
+                Receba resposta em minutos. Se aprovado, 
+                gerencie tudo no seu painel pessoal.
+              </p>
+            </div>
+          </div>
+
+          {/* Detailed Process Flow */}
+          <div className="bg-gradient-to-r from-agri-light to-green-50 rounded-2xl p-8 md:p-12">
+            <div className="text-center mb-12">
+              <h3 className="text-2xl md:text-3xl font-bold text-agri-dark mb-4">
+                Processo Detalhado
+              </h3>
+              <p className="text-lg text-gray-700">
+                Conheça cada etapa do processo de solicitação de crédito
+              </p>
+            </div>
+
+            <div className="space-y-8">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="bg-agri-primary rounded-lg p-4">
+                    <UserPlus className="text-white w-8 h-8" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-agri-dark mb-2">1. Registo Simples</h4>
+                  <p className="text-gray-700 mb-3">
+                    Crie a sua conta fornecendo informações básicas como nome completo, BI, 
+                    número de telemóvel angolano e email (opcional). Escolha se é agricultor individual, 
+                    empresa agrícola, cooperativa ou instituição financeira.
+                  </p>
+                  <div className="text-sm text-agri-dark font-medium">
+                    ⏱️ Tempo estimado: 3-5 minutos
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="bg-agri-secondary rounded-lg p-4">
+                    <Calculator className="text-white w-8 h-8" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-agri-dark mb-2">2. Simulação Personalizada</h4>
+                  <p className="text-gray-700 mb-3">
+                    Use o nosso simulador avançado para calcular prestações mensais, total de juros 
+                    e condições de pagamento. As taxas variam conforme o tipo de projeto agrícola 
+                    (milho, mandioca, gado, avicultura, horticultura).
+                  </p>
+                  <div className="text-sm text-agri-dark font-medium">
+                    💰 Montantes de AOA 500.000 a AOA 50.000.000
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="bg-orange-500 rounded-lg p-4">
+                    <FileText className="text-white w-8 h-8" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-agri-dark mb-2">3. Solicitação Detalhada</h4>
+                  <p className="text-gray-700 mb-3">
+                    Preencha o formulário com informações sobre o seu projeto: nome, tipo de cultivo/criação, 
+                    descrição detalhada, montante necessário e prazo pretendido. 
+                    Sistema faz análise automática baseada no seu perfil.
+                  </p>
+                  <div className="text-sm text-agri-dark font-medium">
+                    📋 Análise automática em tempo real
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-6">
+                <div className="flex-shrink-0">
+                  <div className="bg-green-600 rounded-lg p-4">
+                    <CreditCard className="text-white w-8 h-8" />
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <h4 className="text-xl font-bold text-agri-dark mb-2">4. Gestão e Pagamentos</h4>
+                  <p className="text-gray-700 mb-3">
+                    Após aprovação, aceda ao seu painel pessoal para acompanhar saldos devedores, 
+                    próximas prestações, histórico de pagamentos e gerar relatórios. 
+                    Receba notificações sobre prazos de pagamento.
+                  </p>
+                  <div className="text-sm text-agri-dark font-medium">
+                    📱 Acesso 24/7 pelo telemóvel ou computador
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="text-center mt-12">
+              <Button 
+                onClick={() => setShowRegister(true)}
+                className="bg-agri-primary text-white hover:bg-agri-dark px-8 py-4 rounded-xl text-lg font-semibold shadow-lg"
+              >
+                Começar Agora
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Benefits Section */}
+      <section className="py-20 bg-agri-dark text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">
+              Porquê Escolher o AgroCrédito?
+            </h2>
+            <p className="text-xl text-gray-300 max-w-3xl mx-auto">
+              A primeira plataforma digital de crédito agrícola pensada especificamente 
+              para agricultores angolanos e suas necessidades.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="bg-agri-primary bg-opacity-20 rounded-2xl p-8 border border-agri-primary border-opacity-30">
+              <div className="bg-agri-secondary rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                <Smartphone className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Interface Simples</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Desenhada para utilizadores com baixa literacia digital. 
+                Botões grandes, textos claros e poucos passos para completar qualquer acção.
+              </p>
+            </div>
+
+            <div className="bg-agri-primary bg-opacity-20 rounded-2xl p-8 border border-agri-primary border-opacity-30">
+              <div className="bg-agri-accent rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                <Clock className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Aprovação Rápida</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Análise automática em tempo real. Receba resposta sobre o seu pedido 
+                em minutos, não em semanas como nos bancos tradicionais.
+              </p>
+            </div>
+
+            <div className="bg-agri-primary bg-opacity-20 rounded-2xl p-8 border border-agri-primary border-opacity-30">
+              <div className="bg-green-600 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                <Shield className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">100% Seguro</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Dados protegidos com tecnologia bancária. Criptografia de ponta 
+                e conformidade com as normas de segurança angolanas.
+              </p>
+            </div>
+
+            <div className="bg-agri-primary bg-opacity-20 rounded-2xl p-8 border border-agri-primary border-opacity-30">
+              <div className="bg-orange-500 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                <Calculator className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Simulador Avançado</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Calcule prestações e juros antes de se comprometer. 
+                Condições transparentes adaptadas ao tipo de projeto agrícola.
+              </p>
+            </div>
+
+            <div className="bg-agri-primary bg-opacity-20 rounded-2xl p-8 border border-agri-primary border-opacity-30">
+              <div className="bg-blue-600 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                <CreditCard className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Gestão Total</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Painel pessoal completo para acompanhar saldos, prestações, 
+                histórico e gerar relatórios. Tudo num só lugar.
+              </p>
+            </div>
+
+            <div className="bg-agri-primary bg-opacity-20 rounded-2xl p-8 border border-agri-primary border-opacity-30">
+              <div className="bg-purple-600 rounded-lg w-16 h-16 flex items-center justify-center mb-6">
+                <FileText className="text-white w-8 h-8" />
+              </div>
+              <h3 className="text-xl font-bold mb-4">Relatórios Detalhados</h3>
+              <p className="text-gray-300 leading-relaxed">
+                Exporte relatórios em PDF para acompanhamento financeiro 
+                e prestação de contas. Histórico completo sempre disponível.
+              </p>
+            </div>
+          </div>
+
+          <div className="text-center mt-16">
+            <div className="bg-gradient-to-r from-agri-primary to-agri-secondary rounded-2xl p-8 md:p-12 text-center">
+              <h3 className="text-2xl md:text-3xl font-bold mb-4">
+                Pronto para Transformar o Seu Negócio Agrícola?
+              </h3>
+              <p className="text-xl text-gray-200 mb-8 max-w-2xl mx-auto">
+                Junte-se a centenas de agricultores angolanos que já confiam no AgroCrédito 
+                para financiar os seus projetos e expandir os seus negócios.
+              </p>
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={() => setShowRegister(true)}
+                  className="bg-white text-agri-primary hover:bg-gray-100 px-8 py-4 rounded-xl text-lg font-semibold shadow-lg"
+                >
+                  Criar Conta Gratuita
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+                <Button 
+                  variant="outline"
+                  onClick={() => document.getElementById('simulator-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="border-2 border-white text-white hover:bg-white hover:text-agri-primary px-8 py-4 rounded-xl text-lg font-semibold"
+                >
+                  <Calculator className="w-5 h-5 mr-2" />
+                  Testar Simulador
+                </Button>
+              </div>
             </div>
           </div>
         </div>

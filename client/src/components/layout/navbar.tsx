@@ -24,17 +24,21 @@ export default function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
           
           <div className="hidden md:block">
             <div className="ml-10 flex items-baseline space-x-4">
-              <Link href="/">
-                <a className="text-gray-700 hover:text-agri-primary px-3 py-2 rounded-md text-base font-medium">
-                  Início
-                </a>
+              <Link href="/" className="text-gray-700 hover:text-agri-primary px-3 py-2 rounded-md text-base font-medium">
+                Início
               </Link>
-              <a href="#simulator-section" className="text-gray-700 hover:text-agri-primary px-3 py-2 rounded-md text-base font-medium">
+              <button 
+                onClick={() => document.getElementById('simulator-section')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-gray-700 hover:text-agri-primary px-3 py-2 rounded-md text-base font-medium"
+              >
                 Simulador
-              </a>
-              <a href="#features" className="text-gray-700 hover:text-agri-primary px-3 py-2 rounded-md text-base font-medium">
+              </button>
+              <button 
+                onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                className="text-gray-700 hover:text-agri-primary px-3 py-2 rounded-md text-base font-medium"
+              >
                 Como Funciona
-              </a>
+              </button>
             </div>
           </div>
           
@@ -70,17 +74,27 @@ export default function Navbar({ onLoginClick, onRegisterClick }: NavbarProps) {
         {isMenuOpen && (
           <div className="md:hidden border-t border-gray-200 py-4">
             <div className="flex flex-col space-y-2">
-              <Link href="/">
-                <a className="block px-3 py-2 text-gray-700 hover:text-agri-primary font-medium">
-                  Início
-                </a>
+              <Link href="/" className="block px-3 py-2 text-gray-700 hover:text-agri-primary font-medium">
+                Início
               </Link>
-              <a href="#simulator-section" className="block px-3 py-2 text-gray-700 hover:text-agri-primary font-medium">
+              <button 
+                onClick={() => {
+                  document.getElementById('simulator-section')?.scrollIntoView({ behavior: 'smooth' });
+                  setIsMenuOpen(false);
+                }}
+                className="block text-left px-3 py-2 text-gray-700 hover:text-agri-primary font-medium"
+              >
                 Simulador
-              </a>
-              <a href="#features" className="block px-3 py-2 text-gray-700 hover:text-agri-primary font-medium">
+              </button>
+              <button 
+                onClick={() => {
+                  document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' });
+                  setIsMenuOpen(false);
+                }}
+                className="block text-left px-3 py-2 text-gray-700 hover:text-agri-primary font-medium"
+              >
                 Como Funciona
-              </a>
+              </button>
             </div>
           </div>
         )}
