@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import LoginForm from "@/components/auth/login-form";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -76,13 +77,45 @@ export default function AdminDashboard() {
     enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
   });
 
-  // Verificar se o usuário é admin ou instituição financeira
-  if (!user || (user.userType !== "admin" && user.userType !== "financial_institution")) {
+  // Show login form if not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-lg border">
+            <LoginForm 
+              onSuccess={() => {
+                // User will be redirected automatically after login
+                window.location.reload();
+              }}
+              onSwitchToRegister={() => {
+                // Not needed for admin login
+              }}
+            />
+          </div>
+          <div className="mt-4 text-center text-sm text-gray-600">
+            <p>Painel Administrativo - AgroCrédito</p>
+            <p className="mt-1">Para teste: admin@agricredit.ao / admin123</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has admin permissions
+  if (user.userType !== "admin" && user.userType !== "financial_institution") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-red-600 mb-4">Acesso Negado</h1>
           <p className="text-gray-600">Não tem permissões para aceder a esta página.</p>
+          <Button 
+            onClick={() => logout.mutate()}
+            variant="outline" 
+            className="mt-4"
+          >
+            Fazer Login com Outra Conta
+          </Button>
         </div>
       </div>
     );

@@ -32,27 +32,27 @@ function Router() {
 
   return (
     <Switch>
+      {/* Public routes */}
+      <Route path="/simulator" component={Simulator} />
+      <Route path="/faq" component={FAQ} />
+      <Route path="/contact" component={Contact} />
+      <Route path="/terms" component={Terms} />
+      
+      {/* Admin routes - accessible for both logged in and not logged in users */}
+      <Route path="/admin" component={AdminDashboard} />
+      <Route path="/admin-dashboard" component={AdminDashboard} />
+      
       {!user ? (
         <>
           <Route path="/" component={Landing} />
-          <Route path="/simulator" component={Simulator} />
-          <Route path="/faq" component={FAQ} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/terms" component={Terms} />
         </>
       ) : (
         <>
           <Route path="/" component={user.userType === "admin" || user.userType === "financial_institution" ? AdminDashboard : Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
-          <Route path="/admin" component={AdminDashboard} />
-          <Route path="/admin-dashboard" component={AdminDashboard} />
           <Route path="/credit-application" component={CreditApplication} />
-          <Route path="/simulator" component={Simulator} />
           <Route path="/reports" component={Reports} />
           <Route path="/profile-management" component={ProfileManagement} />
-          <Route path="/faq" component={FAQ} />
-          <Route path="/contact" component={Contact} />
-          <Route path="/terms" component={Terms} />
         </>
       )}
       <Route component={NotFound} />

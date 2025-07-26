@@ -16,17 +16,38 @@ interface AuthResponse {
 }
 
 export function useAuth() {
-  const { data: user, isLoading } = useQuery<User | null>({
+  const { data: user, isLoading, error } = useQuery<User | null>({
     queryKey: ["/api/auth/me"],
     retry: false,
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
+    refetchOnMount: true,
+    refetchInterval: false,
+    refetchIntervalInBackground: false,
+    enabled: !!localStorage.getItem("auth_token"),
+    queryFn: async () => {
+      const token = localStorage.getItem("auth_token");
+      if (!token) {
+        return null;
+      }
+      
+      try {
+        const response = await apiRequest("GET", "/api/auth/me");
+        return response.json();
+      } catch (error: any) {
+        if (error.message.includes("401")) {
+          localStorage.removeItem("auth_token");
+          return null;
+        }
+        throw error;
+      }
+    },
   });
 
   return {
-    user,
+    user: error ? null : user,
     isLoading,
-    isAuthenticated: !!user,
+    isAuthenticated: !!user && !error,
   };
 }
 
