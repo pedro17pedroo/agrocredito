@@ -4,9 +4,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatKwanza, getProjectTypeLabel, getStatusLabel } from "@/lib/angola-utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import type { CreditApplication } from "@shared/schema";
 
 interface ApplicationsListProps {
-  applications: any[];
+  applications: CreditApplication[];
   isLoading: boolean;
 }
 
@@ -68,7 +69,7 @@ export default function ApplicationsList({ applications, isLoading }: Applicatio
             </thead>
             <tbody className="divide-y divide-gray-200">
               {applications.map((application) => {
-                const status = getStatusLabel(application.status);
+                const status = getStatusLabel(application.status || 'pending');
                 
                 return (
                   <tr key={application.id} className="hover:bg-gray-50">
@@ -82,7 +83,7 @@ export default function ApplicationsList({ applications, isLoading }: Applicatio
                       {formatKwanza(application.amount)}
                     </td>
                     <td className="py-4 px-6 text-gray-600">
-                      {format(new Date(application.createdAt), "dd/MM/yyyy", { locale: ptBR })}
+                      {application.createdAt ? format(new Date(application.createdAt), "dd/MM/yyyy", { locale: ptBR }) : '-'}
                     </td>
                     <td className="py-4 px-6">
                       <span className={`px-3 py-1 rounded-full text-sm font-medium ${status.className}`}>

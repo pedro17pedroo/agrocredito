@@ -19,7 +19,7 @@ const registerSchema = z.object({
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   password: z.string().min(6, "Palavra-passe deve ter pelo menos 6 caracteres"),
   confirmPassword: z.string(),
-  userType: z.enum(["farmer", "company", "cooperative", "financial_institution"]),
+  userType: z.enum(["farmer", "company", "cooperative", "financial_institution", "admin"]),
   acceptTerms: z.boolean().refine((val) => val === true, "Deve aceitar os termos"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Palavras-passe não coincidem",
@@ -98,6 +98,7 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
                     <SelectItem value="company">Empresa Agrícola</SelectItem>
                     <SelectItem value="cooperative">Cooperativa Agrícola</SelectItem>
                     <SelectItem value="financial_institution">Instituição Financeira</SelectItem>
+                    <SelectItem value="admin">Administrador</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />

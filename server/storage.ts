@@ -3,6 +3,7 @@ import {
   creditApplications, 
   accounts, 
   payments,
+  notifications,
   type User, 
   type InsertUser,
   type CreditApplication,
@@ -10,7 +11,9 @@ import {
   type Account,
   type InsertAccount,
   type Payment,
-  type InsertPayment
+  type InsertPayment,
+  type Notification,
+  type InsertNotification
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -25,8 +28,9 @@ export interface IStorage {
   // Credit application operations
   createCreditApplication(application: InsertCreditApplication): Promise<CreditApplication>;
   getCreditApplicationsByUserId(userId: string): Promise<CreditApplication[]>;
+  getAllCreditApplications(): Promise<CreditApplication[]>;
   getCreditApplicationById(id: string): Promise<CreditApplication | undefined>;
-  updateCreditApplicationStatus(id: string, status: "pending" | "approved" | "rejected", rejectionReason?: string): Promise<void>;
+  updateCreditApplicationStatus(id: string, status: "pending" | "under_review" | "approved" | "rejected", rejectionReason?: string): Promise<void>;
 
   // Account operations
   createAccount(account: InsertAccount): Promise<Account>;
@@ -37,6 +41,12 @@ export interface IStorage {
   // Payment operations
   createPayment(payment: InsertPayment): Promise<Payment>;
   getPaymentsByAccountId(accountId: string): Promise<Payment[]>;
+
+  // Notification operations
+  createNotification(notification: InsertNotification): Promise<Notification>;
+  getNotificationsByUserId(userId: string): Promise<Notification[]>;
+  markNotificationAsRead(notificationId: string): Promise<void>;
+  markAllNotificationsAsRead(userId: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -93,9 +103,16 @@ export class DatabaseStorage implements IStorage {
     return app;
   }
 
+  async getAllCreditApplications(): Promise<CreditApplication[]> {
+    return await db
+      .select()
+      .from(creditApplications)
+      .orderBy(desc(creditApplications.createdAt));
+  }
+
   async updateCreditApplicationStatus(
     id: string, 
-    status: "pending" | "approved" | "rejected", 
+    status: "pending" | "under_review" | "approved" | "rejected", 
     rejectionReason?: string
   ): Promise<void> {
     await db
@@ -164,6 +181,46 @@ export class DatabaseStorage implements IStorage {
       .from(payments)
       .where(eq(payments.accountId, accountId))
       .orderBy(desc(payments.paymentDate));
+  }
+
+  // Notification operations
+  async createNotification(notification: InsertNotification): Promise<Notification> {
+    const [notif] = await db
+      .insert(notifications)
+      .values({
+        ...notification,
+        updatedAt: new Date(),
+      })
+      .returning();
+    return notif;
+  }
+
+  async getNotificationsByUserId(userId: string): Promise<Notification[]> {
+    return await db
+      .select()
+      .from(notifications)
+      .where(eq(notifications.userId, userId))
+      .orderBy(desc(notifications.createdAt));
+  }
+
+  async markNotificationAsRead(notificationId: string): Promise<void> {
+    await db
+      .update(notifications)
+      .set({
+        isRead: true,
+        updatedAt: new Date(),
+      })
+      .where(eq(notifications.id, notificationId));
+  }
+
+  async markAllNotificationsAsRead(userId: string): Promise<void> {
+    await db
+      .update(notifications)
+      .set({
+        isRead: true,
+        updatedAt: new Date(),
+      })
+      .where(and(eq(notifications.userId, userId), eq(notifications.isRead, false)));
   }
 }
 

@@ -184,6 +184,124 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Admin routes for financial institutions
+  app.get("/api/admin/credit-applications", authenticateToken, async (req: any, res) => {
+    try {
+      // Verificar se o usuário é admin ou instituição financeira
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const applications = await storage.getAllCreditApplications();
+      res.json(applications);
+    } catch (error) {
+      console.error("Get all applications error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/admin/credit-applications/:id/status", authenticateToken, async (req: any, res) => {
+    try {
+      // Verificar se o usuário é admin ou instituição financeira
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const { id } = req.params;
+      const { status, rejectionReason } = req.body;
+
+      if (!["pending", "under_review", "approved", "rejected"].includes(status)) {
+        return res.status(400).json({ message: "Estado inválido" });
+      }
+
+      await storage.updateCreditApplicationStatus(id, status, rejectionReason);
+      
+      // Se aprovado, criar conta automaticamente
+      if (status === "approved") {
+        const application = await storage.getCreditApplicationById(id);
+        if (application) {
+          // Calcular taxa de juros baseada no tipo de projeto
+          let baseRate = 15;
+          const rateAdjustments: { [key: string]: number } = {
+            cattle: -2, corn: -1, cassava: 0, horticulture: 1, poultry: 2, other: 3,
+          };
+          const interestRate = baseRate + (rateAdjustments[application.projectType] || 0);
+          
+          // Calcular pagamento mensal
+          const monthlyRate = interestRate / 100 / 12;
+          const numPayments = application.term;
+          const principal = parseFloat(application.amount);
+          
+          const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                               (Math.pow(1 + monthlyRate, numPayments) - 1);
+          
+          const totalAmount = monthlyPayment * numPayments;
+          
+          // Calcular próxima data de pagamento (30 dias a partir de hoje)
+          const nextPaymentDate = new Date();
+          nextPaymentDate.setDate(nextPaymentDate.getDate() + 30);
+
+          await storage.createAccount({
+            applicationId: application.id,
+            userId: application.userId,
+            totalAmount: totalAmount.toString(),
+            outstandingBalance: totalAmount.toString(),
+            monthlyPayment: monthlyPayment.toString(),
+            nextPaymentDate,
+          });
+
+          // Criar notificação de aprovação
+          await storage.createNotification({
+            userId: application.userId,
+            type: "application_approved",
+            title: "Solicitação Aprovada!",
+            message: `A sua solicitação de crédito para "${application.projectName}" foi aprovada. Uma conta foi criada automaticamente.`,
+            relatedId: application.id,
+          });
+        }
+      } else if (status === "rejected") {
+        // Criar notificação de rejeição
+        const application = await storage.getCreditApplicationById(id);
+        if (application) {
+          await storage.createNotification({
+            userId: application.userId,
+            type: "application_rejected",
+            title: "Solicitação Rejeitada",
+            message: `A sua solicitação de crédito para "${application.projectName}" foi rejeitada. ${rejectionReason || ""}`,
+            relatedId: application.id,
+          });
+        }
+      }
+
+      res.json({ message: "Estado atualizado com sucesso" });
+    } catch (error) {
+      console.error("Update application status error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/admin/stats", authenticateToken, async (req: any, res) => {
+    try {
+      // Verificar se o usuário é admin ou instituição financeira
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const applications = await storage.getAllCreditApplications();
+      const stats = {
+        total: applications.length,
+        pending: applications.filter(app => app.status === "pending").length,
+        approved: applications.filter(app => app.status === "approved").length,
+        rejected: applications.filter(app => app.status === "rejected").length,
+      };
+
+      res.json(stats);
+    } catch (error) {
+      console.error("Get stats error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   // Credit simulation endpoint
   app.post("/api/simulate-credit", async (req, res) => {
     try {
@@ -226,6 +344,119 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       console.error("Simulation error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Notification routes
+  app.get("/api/notifications", authenticateToken, async (req: any, res) => {
+    try {
+      const notifications = await storage.getNotificationsByUserId(req.user.id);
+      res.json(notifications);
+    } catch (error) {
+      console.error("Get notifications error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/notifications/:id/read", authenticateToken, async (req: any, res) => {
+    try {
+      await storage.markNotificationAsRead(req.params.id);
+      res.json({ message: "Notificação marcada como lida" });
+    } catch (error) {
+      console.error("Mark notification as read error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.patch("/api/notifications/mark-all-read", authenticateToken, async (req: any, res) => {
+    try {
+      await storage.markAllNotificationsAsRead(req.user.id);
+      res.json({ message: "Todas as notificações marcadas como lidas" });
+    } catch (error) {
+      console.error("Mark all notifications as read error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Account payment routes
+  app.post("/api/accounts/:id/payments", authenticateToken, async (req: any, res) => {
+    try {
+      const { amount, paymentDate } = req.body;
+      const accountId = req.params.id;
+
+      // Verificar se a conta pertence ao usuário
+      const account = await storage.getAccountById(accountId);
+      if (!account || account.userId !== req.user.id) {
+        return res.status(404).json({ message: "Conta não encontrada" });
+      }
+
+      // Criar o pagamento
+      const payment = await storage.createPayment({
+        accountId,
+        amount: amount.toString(),
+        paymentDate: new Date(paymentDate),
+      });
+
+      // Atualizar o saldo da conta
+      const newBalance = parseFloat(account.outstandingBalance) - parseFloat(amount);
+      
+      // Calcular próxima data de pagamento (30 dias a partir de hoje)
+      const nextPaymentDate = new Date();
+      nextPaymentDate.setDate(nextPaymentDate.getDate() + 30);
+
+      await storage.updateAccountBalance(accountId, Math.max(0, newBalance), nextPaymentDate);
+
+      // Criar notificação de confirmação de pagamento
+      await storage.createNotification({
+        userId: req.user.id,
+        type: "payment_confirmed",
+        title: "Pagamento Confirmado",
+        message: `Pagamento de ${new Intl.NumberFormat('pt-AO', { style: 'currency', currency: 'AOA' }).format(parseFloat(amount))} foi processado com sucesso.`,
+        relatedId: accountId,
+      });
+
+      res.status(201).json(payment);
+    } catch (error) {
+      console.error("Create payment error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/accounts/:id/payments", authenticateToken, async (req: any, res) => {
+    try {
+      const accountId = req.params.id;
+
+      // Verificar se a conta pertence ao usuário
+      const account = await storage.getAccountById(accountId);
+      if (!account || account.userId !== req.user.id) {
+        return res.status(404).json({ message: "Conta não encontrada" });
+      }
+
+      const payments = await storage.getPaymentsByAccountId(accountId);
+      res.json(payments);
+    } catch (error) {
+      console.error("Get payments error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Reports endpoint to get all payments for the user
+  app.get("/api/reports/payments", authenticateToken, async (req: any, res) => {
+    try {
+      // Get all accounts for the user
+      const accounts = await storage.getAccountsByUserId(req.user.id);
+      const allPayments = [];
+      
+      // Get payments for each account
+      for (const account of accounts) {
+        const payments = await storage.getPaymentsByAccountId(account.id);
+        allPayments.push(...payments);
+      }
+      
+      res.json(allPayments);
+    } catch (error) {
+      console.error("Get reports payments error:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });

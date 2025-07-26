@@ -6,8 +6,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "./hooks/use-auth";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
+import AdminDashboard from "@/pages/admin-dashboard";
 import CreditApplication from "@/pages/credit-application";
 import Simulator from "@/pages/simulator";
+import Reports from "@/pages/reports";
 import FAQ from "@/pages/faq";
 import Contact from "@/pages/contact";
 import Terms from "@/pages/terms";
@@ -39,10 +41,12 @@ function Router() {
         </>
       ) : (
         <>
-          <Route path="/" component={Dashboard} />
+          <Route path="/" component={user.userType === "admin" || user.userType === "financial_institution" ? AdminDashboard : Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
+          <Route path="/admin" component={AdminDashboard} />
           <Route path="/credit-application" component={CreditApplication} />
           <Route path="/simulator" component={Simulator} />
+          <Route path="/reports" component={Reports} />
           <Route path="/faq" component={FAQ} />
           <Route path="/contact" component={Contact} />
           <Route path="/terms" component={Terms} />

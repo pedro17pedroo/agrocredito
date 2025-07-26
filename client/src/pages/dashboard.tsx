@@ -5,17 +5,19 @@ import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
 import StatsCards from "@/components/dashboard/stats-cards";
 import ApplicationsList from "@/components/dashboard/applications-list";
+import NotificationCenter from "@/components/notifications/notification-center";
 import { formatKwanza } from "@/lib/angola-utils";
+import type { CreditApplication, Account } from "@shared/schema";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const logout = useLogout();
 
-  const { data: applications = [], isLoading: applicationsLoading } = useQuery({
+  const { data: applications = [], isLoading: applicationsLoading } = useQuery<CreditApplication[]>({
     queryKey: ["/api/credit-applications"],
   });
 
-  const { data: accounts = [], isLoading: accountsLoading } = useQuery({
+  const { data: accounts = [], isLoading: accountsLoading } = useQuery<Account[]>({
     queryKey: ["/api/accounts"],
   });
 
@@ -36,6 +38,7 @@ export default function Dashboard() {
               <span className="text-xl font-bold">Painel AgroCrédito</span>
             </div>
             <div className="flex items-center space-x-4">
+              <NotificationCenter />
               <span className="hidden sm:block">{user.fullName}</span>
               <Button
                 variant="secondary"
@@ -92,16 +95,18 @@ export default function Dashboard() {
             </Button>
           </Link>
 
-          <Button 
-            variant="outline"
-            className="w-full border-2 border-agri-secondary text-agri-secondary p-6 rounded-xl hover:bg-agri-secondary hover:text-white transition-colors text-left group h-auto"
-          >
-            <div className="flex flex-col items-start">
-              <Download className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-              <h3 className="text-xl font-bold mb-2 text-left">Relatórios</h3>
-              <p className="opacity-80 text-left">Descarregue os seus relatórios financeiros</p>
-            </div>
-          </Button>
+          <Link href="/reports">
+            <Button 
+              variant="outline"
+              className="w-full border-2 border-agri-secondary text-agri-secondary p-6 rounded-xl hover:bg-agri-secondary hover:text-white transition-colors text-left group h-auto"
+            >
+              <div className="flex flex-col items-start">
+                <Download className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
+                <h3 className="text-xl font-bold mb-2 text-left">Relatórios</h3>
+                <p className="opacity-80 text-left">Descarregue os seus relatórios financeiros</p>
+              </div>
+            </Button>
+          </Link>
         </div>
 
         {/* Applications List */}

@@ -4,9 +4,9 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 // Enums
-export const userTypeEnum = pgEnum("user_type", ["farmer", "company", "cooperative", "financial_institution"]);
+export const userTypeEnum = pgEnum("user_type", ["farmer", "company", "cooperative", "financial_institution", "admin"]);
 export const projectTypeEnum = pgEnum("project_type", ["corn", "cassava", "cattle", "poultry", "horticulture", "other"]);
-export const applicationStatusEnum = pgEnum("application_status", ["pending", "approved", "rejected"]);
+export const applicationStatusEnum = pgEnum("application_status", ["pending", "under_review", "approved", "rejected"]);
 
 // Users table
 export const users = pgTable("users", {
@@ -61,6 +61,19 @@ export const payments = pgTable("payments", {
   createdAt: timestamp("created_at").defaultNow(),
 });
 
+// Notifications table
+export const notifications = pgTable("notifications", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  userId: varchar("user_id").notNull().references(() => users.id),
+  type: varchar("type", { length: 50 }).notNull(),
+  title: varchar("title", { length: 255 }).notNull(),
+  message: text("message").notNull(),
+  isRead: boolean("is_read").default(false).notNull(),
+  relatedId: varchar("related_id", { length: 21 }),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Insert schemas
 export const insertUserSchema = createInsertSchema(users).omit({
   id: true,
@@ -88,6 +101,12 @@ export const insertPaymentSchema = createInsertSchema(payments).omit({
   createdAt: true,
 });
 
+export const insertNotificationSchema = createInsertSchema(notifications).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -100,3 +119,6 @@ export type InsertAccount = z.infer<typeof insertAccountSchema>;
 
 export type Payment = typeof payments.$inferSelect;
 export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+
+export type Notification = typeof notifications.$inferSelect;
+export type InsertNotification = z.infer<typeof insertNotificationSchema>;
