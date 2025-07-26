@@ -588,7 +588,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   // Get all users (admin only)
-  app.get("/api/users", authenticateToken, async (req: any, res) => {
+  app.get("/api/admin/users", authenticateToken, async (req: any, res) => {
     try {
       if (req.user.userType !== "admin") {
         return res.status(403).json({ message: "Acesso negado" });
@@ -612,6 +612,98 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(allUsers);
     } catch (error) {
       console.error("Get users error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Create user (admin only)
+  app.post("/api/admin/users", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.userType !== "admin") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+
+      const userData = insertUserSchema.parse(req.body);
+      
+      // Check if user already exists
+      const existingUser = await storage.getUserByPhone(userData.phone) || 
+                          (userData.email ? await storage.getUserByEmail(userData.email) : null);
+      
+      if (existingUser) {
+        return res.status(400).json({ message: "Utilizador já existe com este telefone ou email" });
+      }
+
+      // Hash password with default password
+      const defaultPassword = "123456"; // Default password for admin-created users
+      const hashedPassword = await bcrypt.hash(defaultPassword, 10);
+      
+      // Create user
+      const user = await storage.createUser({
+        ...userData,
+        password: hashedPassword,
+      });
+
+      res.status(201).json({
+        message: "Utilizador criado com sucesso",
+        user: {
+          id: user.id,
+          fullName: user.fullName,
+          phone: user.phone,
+          email: user.email,
+          userType: user.userType,
+        },
+        defaultPassword: defaultPassword // Send back so admin can inform user
+      });
+    } catch (error) {
+      console.error("Create user error:", error);
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Get all profiles (admin only)
+  app.get("/api/admin/profiles", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.userType !== "admin") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      const profiles = await storage.getAllProfiles();
+      res.json(profiles);
+    } catch (error) {
+      console.error("Get profiles error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Get all permissions (admin only)
+  app.get("/api/admin/permissions", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.userType !== "admin") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      const permissions = await storage.getAllPermissions();
+      res.json(permissions);
+    } catch (error) {
+      console.error("Get permissions error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Get all accounts (admin only)
+  app.get("/api/admin/accounts", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.userType !== "admin") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      const accounts = await storage.getAllAccounts();
+      res.json(accounts);
+    } catch (error) {
+      console.error("Get accounts error:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });

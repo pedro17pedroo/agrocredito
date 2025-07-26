@@ -44,6 +44,7 @@ export interface IStorage {
   // Account operations
   createAccount(account: InsertAccount): Promise<Account>;
   getAccountsByUserId(userId: string): Promise<Account[]>;
+  getAllAccounts(): Promise<Account[]>;
   getAccountById(id: string): Promise<Account | undefined>;
   updateAccountBalance(id: string, newBalance: number, nextPaymentDate?: Date): Promise<void>;
 
@@ -172,6 +173,13 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(accounts)
       .where(and(eq(accounts.userId, userId), eq(accounts.isActive, true)))
+      .orderBy(desc(accounts.createdAt));
+  }
+
+  async getAllAccounts(): Promise<Account[]> {
+    return await db
+      .select()
+      .from(accounts)
       .orderBy(desc(accounts.createdAt));
   }
 
