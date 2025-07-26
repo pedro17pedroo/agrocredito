@@ -10,6 +10,7 @@ import AdminDashboard from "@/pages/admin-dashboard";
 import CreditApplication from "@/pages/credit-application";
 import Simulator from "@/pages/simulator";
 import Reports from "@/pages/reports";
+import ProfileManagement from "@/pages/profile-management";
 import FAQ from "@/pages/faq";
 import Contact from "@/pages/contact";
 import Terms from "@/pages/terms";
@@ -47,6 +48,7 @@ function Router() {
           <Route path="/credit-application" component={CreditApplication} />
           <Route path="/simulator" component={Simulator} />
           <Route path="/reports" component={Reports} />
+          <Route path="/profile-management" component={ProfileManagement} />
           <Route path="/faq" component={FAQ} />
           <Route path="/contact" component={Contact} />
           <Route path="/terms" component={Terms} />

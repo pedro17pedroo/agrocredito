@@ -8,6 +8,35 @@ export const userTypeEnum = pgEnum("user_type", ["farmer", "company", "cooperati
 export const projectTypeEnum = pgEnum("project_type", ["corn", "cassava", "cattle", "poultry", "horticulture", "other"]);
 export const applicationStatusEnum = pgEnum("application_status", ["pending", "under_review", "approved", "rejected"]);
 
+// Profiles table for role management
+export const profiles = pgTable("profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  isActive: boolean("is_active").default(true),
+  isSystem: boolean("is_system").default(false), // System profiles cannot be deleted
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
+// Permissions table
+export const permissions = pgTable("permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  name: varchar("name", { length: 100 }).notNull().unique(),
+  description: text("description"),
+  module: varchar("module", { length: 50 }).notNull(), // e.g., 'applications', 'accounts', 'reports', 'admin'
+  action: varchar("action", { length: 50 }).notNull(), // e.g., 'create', 'read', 'update', 'delete', 'approve'
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+// Profile permissions junction table
+export const profilePermissions = pgTable("profile_permissions", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  profileId: varchar("profile_id").notNull().references(() => profiles.id, { onDelete: 'cascade' }),
+  permissionId: varchar("permission_id").notNull().references(() => permissions.id, { onDelete: 'cascade' }),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
 // Users table
 export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
@@ -18,6 +47,8 @@ export const users = pgTable("users", {
   email: varchar("email", { length: 255 }).unique(), // Email is optional
   password: text("password").notNull(),
   userType: userTypeEnum("user_type").notNull(),
+  profileId: varchar("profile_id").references(() => profiles.id), // Link to profile for permissions
+  isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -107,6 +138,22 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
   updatedAt: true,
 });
 
+export const insertProfileSchema = createInsertSchema(profiles).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
+export const insertPermissionSchema = createInsertSchema(permissions).omit({
+  id: true,
+  createdAt: true,
+});
+
+export const insertProfilePermissionSchema = createInsertSchema(profilePermissions).omit({
+  id: true,
+  createdAt: true,
+});
+
 // Types
 export type User = typeof users.$inferSelect;
 export type InsertUser = z.infer<typeof insertUserSchema>;
@@ -122,3 +169,12 @@ export type InsertPayment = z.infer<typeof insertPaymentSchema>;
 
 export type Notification = typeof notifications.$inferSelect;
 export type InsertNotification = z.infer<typeof insertNotificationSchema>;
+
+export type Profile = typeof profiles.$inferSelect;
+export type InsertProfile = z.infer<typeof insertProfileSchema>;
+
+export type Permission = typeof permissions.$inferSelect;
+export type InsertPermission = z.infer<typeof insertPermissionSchema>;
+
+export type ProfilePermission = typeof profilePermissions.$inferSelect;
+export type InsertProfilePermission = z.infer<typeof insertProfilePermissionSchema>;

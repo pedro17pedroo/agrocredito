@@ -1,9 +1,18 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
+import { db } from "./db";
+import { users } from "@shared/schema";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import { insertUserSchema, insertCreditApplicationSchema } from "@shared/schema";
+import { 
+  insertUserSchema, 
+  insertCreditApplicationSchema, 
+  insertProfileSchema,
+  insertAccountSchema,
+  insertPaymentSchema,
+  insertNotificationSchema 
+} from "@shared/schema";
 import { z } from "zod";
 
 // JWT secret - in production this should be in environment variables
@@ -457,6 +466,152 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(allPayments);
     } catch (error) {
       console.error("Get reports payments error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Profile management routes
+  app.get("/api/profiles", authenticateToken, async (req: any, res) => {
+    try {
+      const profiles = await storage.getAllProfiles();
+      res.json(profiles);
+    } catch (error) {
+      console.error("Get profiles error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/profiles", authenticateToken, async (req: any, res) => {
+    try {
+      const profileData = insertProfileSchema.parse(req.body);
+      const profile = await storage.createProfile(profileData);
+      res.status(201).json(profile);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Dados inválidos", errors: error.errors });
+      }
+      console.error("Create profile error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.put("/api/profiles/:id", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const updateData = req.body;
+      await storage.updateProfile(id, updateData);
+      res.json({ message: "Perfil actualizado com sucesso" });
+    } catch (error) {
+      console.error("Update profile error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.delete("/api/profiles/:id", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      await storage.deleteProfile(id);
+      res.json({ message: "Perfil eliminado com sucesso" });
+    } catch (error) {
+      console.error("Delete profile error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Permission management routes
+  app.get("/api/permissions", authenticateToken, async (req: any, res) => {
+    try {
+      const permissions = await storage.getAllPermissions();
+      res.json(permissions);
+    } catch (error) {
+      console.error("Get permissions error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.get("/api/profiles/:id/permissions", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const permissions = await storage.getProfilePermissions(id);
+      res.json(permissions);
+    } catch (error) {
+      console.error("Get profile permissions error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.post("/api/profiles/:id/permissions", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { permissionId } = req.body;
+      await storage.addPermissionToProfile(id, permissionId);
+      res.json({ message: "Permissão adicionada ao perfil" });
+    } catch (error) {
+      console.error("Add permission to profile error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  app.delete("/api/profiles/:id/permissions/:permissionId", authenticateToken, async (req: any, res) => {
+    try {
+      const { id, permissionId } = req.params;
+      await storage.removePermissionFromProfile(id, permissionId);
+      res.json({ message: "Permissão removida do perfil" });
+    } catch (error) {
+      console.error("Remove permission from profile error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // User profile assignment
+  app.put("/api/users/:id/profile", authenticateToken, async (req: any, res) => {
+    try {
+      const { id } = req.params;
+      const { profileId } = req.body;
+      await storage.assignProfileToUser(id, profileId);
+      res.json({ message: "Perfil atribuído ao utilizador" });
+    } catch (error) {
+      console.error("Assign profile to user error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Get user permissions
+  app.get("/api/users/me/permissions", authenticateToken, async (req: any, res) => {
+    try {
+      const permissions = await storage.getUserPermissions(req.user.id);
+      res.json(permissions);
+    } catch (error) {
+      console.error("Get user permissions error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
+  // Get all users (admin only)
+  app.get("/api/users", authenticateToken, async (req: any, res) => {
+    try {
+      if (req.user.userType !== "admin") {
+        return res.status(403).json({ message: "Acesso negado" });
+      }
+      
+      // Get all users without password
+      const allUsers = await db.select({
+        id: users.id,
+        fullName: users.fullName,
+        bi: users.bi,
+        nif: users.nif,
+        phone: users.phone,
+        email: users.email,
+        userType: users.userType,
+        profileId: users.profileId,
+        isActive: users.isActive,
+        createdAt: users.createdAt,
+        updatedAt: users.updatedAt,
+      }).from(users);
+      
+      res.json(allUsers);
+    } catch (error) {
+      console.error("Get users error:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
     }
   });
