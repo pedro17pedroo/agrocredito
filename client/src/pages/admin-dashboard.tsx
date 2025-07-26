@@ -9,7 +9,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -45,6 +45,37 @@ export default function AdminDashboard() {
     profileId: ''
   });
 
+  // Move queries outside of conditional logic to avoid hooks error
+  const { data: allApplications = [], isLoading } = useQuery<CreditApplication[]>({
+    queryKey: ["/api/admin/credit-applications"],
+    enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
+  });
+
+  const { data: stats } = useQuery({
+    queryKey: ["/api/admin/stats"],
+    enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
+  });
+
+  const { data: allUsers = [] } = useQuery<User[]>({
+    queryKey: ["/api/admin/users"],
+    enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
+  });
+
+  const { data: profiles = [] } = useQuery<Profile[]>({
+    queryKey: ["/api/admin/profiles"],
+    enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
+  });
+
+  const { data: permissions = [] } = useQuery<Permission[]>({
+    queryKey: ["/api/admin/permissions"],
+    enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
+  });
+
+  const { data: accounts = [] } = useQuery<any[]>({
+    queryKey: ["/api/admin/accounts"],
+    enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
+  });
+
   // Verificar se o usuário é admin ou instituição financeira
   if (!user || (user.userType !== "admin" && user.userType !== "financial_institution")) {
     return (
@@ -56,30 +87,6 @@ export default function AdminDashboard() {
       </div>
     );
   }
-
-  const { data: allApplications = [], isLoading } = useQuery<CreditApplication[]>({
-    queryKey: ["/api/admin/credit-applications"],
-  });
-
-  const { data: stats } = useQuery({
-    queryKey: ["/api/admin/stats"],
-  });
-
-  const { data: allUsers = [] } = useQuery<User[]>({
-    queryKey: ["/api/admin/users"],
-  });
-
-  const { data: profiles = [] } = useQuery<Profile[]>({
-    queryKey: ["/api/admin/profiles"],
-  });
-
-  const { data: permissions = [] } = useQuery<Permission[]>({
-    queryKey: ["/api/admin/permissions"],
-  });
-
-  const { data: accounts = [] } = useQuery<any[]>({
-    queryKey: ["/api/admin/accounts"],
-  });
 
   const updateApplicationStatus = useMutation({
     mutationFn: async ({ id, status, rejectionReason }: { id: string; status: string; rejectionReason?: string }) => {
@@ -242,6 +249,9 @@ export default function AdminDashboard() {
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Criar Novo Utilizador</DialogTitle>
+          <DialogDescription>
+            Preencha os dados abaixo para criar um novo utilizador no sistema.
+          </DialogDescription>
         </DialogHeader>
         <div className="grid grid-cols-2 gap-4">
           <div>

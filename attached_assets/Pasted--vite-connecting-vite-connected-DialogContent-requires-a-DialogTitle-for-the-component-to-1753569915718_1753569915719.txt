@@ -1,0 +1,24 @@
+[vite] connecting...
+[vite] connected.
+`DialogContent` requires a `DialogTitle` for the component to be accessible for screen reader users.
+
+If you want to hide the `DialogTitle`, you can wrap it with our VisuallyHidden component.
+
+For more information, see https://radix-ui.com/primitives/docs/components/dialog
+Warning: Missing `Description` or `aria-describedby={undefined}` for {DialogContent}.
+Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
+The above error occurred in the <AdminDashboard> component:
+
+    at AdminDashboard (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/src/pages/admin-dashboard.tsx:54:20)
+    at Route (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=71791eb6:323:16)
+    at Switch (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=71791eb6:379:17)
+    at Router (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/src/App.tsx?v=ES5k2HfTCM0RPI8GXGmdS:37:31)
+    at Provider (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/chunk-OXZDJRWN.js?v=71791eb6:38:15)
+    at TooltipProvider (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=71791eb6:66:5)
+    at QueryClientProvider (https://2eab5d08-877c-4454-ba95-d1fdba82f67d-00-dvjozk3c7az9.kirk.replit.dev/@fs/home/runner/workspace/node_modules/.vite/deps/@tanstack_react-query.js?v=71791eb6:2805:3)
+    at App
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+Rendered fewer hooks than expected. This may be caused by an accidental early return statement.
