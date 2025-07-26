@@ -8,6 +8,9 @@ import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import CreditApplication from "@/pages/credit-application";
 import Simulator from "@/pages/simulator";
+import FAQ from "@/pages/faq";
+import Contact from "@/pages/contact";
+import Terms from "@/pages/terms";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -30,6 +33,9 @@ function Router() {
         <>
           <Route path="/" component={Landing} />
           <Route path="/simulator" component={Simulator} />
+          <Route path="/faq" component={FAQ} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/terms" component={Terms} />
         </>
       ) : (
         <>
@@ -37,6 +43,9 @@ function Router() {
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/credit-application" component={CreditApplication} />
           <Route path="/simulator" component={Simulator} />
+          <Route path="/faq" component={FAQ} />
+          <Route path="/contact" component={Contact} />
+          <Route path="/terms" component={Terms} />
         </>
       )}
       <Route component={NotFound} />

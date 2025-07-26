@@ -1,4 +1,5 @@
 import { Sprout, Facebook, Twitter, Linkedin, Phone, Mail, MapPin } from "lucide-react";
+import { Link } from "wouter";
 
 export default function Footer() {
   return (
@@ -30,20 +31,58 @@ export default function Footer() {
           <div>
             <h3 className="text-xl font-bold mb-6">Serviços</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Crédito Agrícola</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Simulador de Financiamento</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Gestão de Contas</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Relatórios Financeiros</a></li>
+              <li>
+                <button 
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Crédito Agrícola
+                </button>
+              </li>
+              <li>
+                <Link href="/simulator" className="text-gray-300 hover:text-white transition-colors">
+                  Simulador de Financiamento
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                  Gestão de Contas
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                  Relatórios Financeiros
+                </Link>
+              </li>
             </ul>
           </div>
           
           <div>
             <h3 className="text-xl font-bold mb-6">Suporte</h3>
             <ul className="space-y-3">
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Como Funciona</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Perguntas Frequentes</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Contactar Suporte</a></li>
-              <li><a href="#" className="text-gray-300 hover:text-white transition-colors">Termos de Serviço</a></li>
+              <li>
+                <button 
+                  onClick={() => document.getElementById('features')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
+                  Como Funciona
+                </button>
+              </li>
+              <li>
+                <Link href="/faq" className="text-gray-300 hover:text-white transition-colors">
+                  Perguntas Frequentes
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact" className="text-gray-300 hover:text-white transition-colors">
+                  Contactar Suporte
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-gray-300 hover:text-white transition-colors">
+                  Termos de Serviço
+                </Link>
+              </li>
             </ul>
           </div>
           
