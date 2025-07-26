@@ -8,6 +8,13 @@ AgriCredit is a comprehensive web application designed to democratize access to 
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+- **July 26, 2025**: Successfully migrated AgriCredit project from Replit Agent to Replit environment
+- **Database Setup**: Created and configured PostgreSQL database with proper schema migration
+- **UI Enhancement**: Updated footer "Simulador de Financiamento" link to scroll smoothly to simulator section instead of opening new page
+- **Security**: Implemented proper client/server separation and robust security practices
+
 ## System Architecture
 
 ### Frontend Architecture

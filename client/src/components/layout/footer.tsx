@@ -40,9 +40,12 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <Link href="/simulator" className="text-gray-300 hover:text-white transition-colors">
+                <button 
+                  onClick={() => document.getElementById('simulator-section')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Simulador de Financiamento
-                </Link>
+                </button>
               </li>
               <li>
                 <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
