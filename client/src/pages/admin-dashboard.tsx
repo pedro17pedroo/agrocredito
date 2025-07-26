@@ -27,10 +27,13 @@ import type { CreditApplication, User, Profile, Permission } from "@shared/schem
 type AdminSection = 'dashboard' | 'users' | 'applications' | 'accounts' | 'reports' | 'profiles' | 'permissions';
 
 export default function AdminDashboard() {
+  // ALL HOOKS MUST BE CALLED BEFORE ANY EARLY RETURNS
   const { user } = useAuth();
   const logout = useLogout();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // State hooks
   const [selectedApplication, setSelectedApplication] = useState<CreditApplication | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [activeSection, setActiveSection] = useState<AdminSection>('dashboard');
@@ -46,7 +49,7 @@ export default function AdminDashboard() {
     profileId: ''
   });
 
-  // Move queries outside of conditional logic to avoid hooks error
+  // Query hooks - all must be called before any early returns
   const { data: allApplications = [], isLoading } = useQuery<CreditApplication[]>({
     queryKey: ["/api/admin/credit-applications"],
     enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
@@ -77,50 +80,7 @@ export default function AdminDashboard() {
     enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
   });
 
-  // Show login form if not authenticated
-  if (!user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-lg shadow-lg border">
-            <LoginForm 
-              onSuccess={() => {
-                // User will be redirected automatically after login
-                window.location.reload();
-              }}
-              onSwitchToRegister={() => {
-                // Not needed for admin login
-              }}
-            />
-          </div>
-          <div className="mt-4 text-center text-sm text-gray-600">
-            <p>Painel Administrativo - AgroCrédito</p>
-            <p className="mt-1">Para teste: admin@agricredit.ao / admin123</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // Check if user has admin permissions
-  if (user.userType !== "admin" && user.userType !== "financial_institution") {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-600 mb-4">Acesso Negado</h1>
-          <p className="text-gray-600">Não tem permissões para aceder a esta página.</p>
-          <Button 
-            onClick={() => logout.mutate()}
-            variant="outline" 
-            className="mt-4"
-          >
-            Fazer Login com Outra Conta
-          </Button>
-        </div>
-      </div>
-    );
-  }
-
+  // Mutation hooks - also must be called before early returns
   const updateApplicationStatus = useMutation({
     mutationFn: async ({ id, status, rejectionReason }: { id: string; status: string; rejectionReason?: string }) => {
       const response = await apiRequest("PATCH", `/api/admin/credit-applications/${id}/status`, {
@@ -178,6 +138,52 @@ export default function AdminDashboard() {
       });
     },
   });
+
+  // NOW we can do early returns after ALL hooks are defined
+  
+  // Show login form if not authenticated
+  if (!user) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-lg shadow-lg border">
+            <LoginForm 
+              onSuccess={() => {
+                // User will be redirected automatically after login
+                window.location.reload();
+              }}
+              onSwitchToRegister={() => {
+                // Not needed for admin login
+              }}
+            />
+          </div>
+          <div className="mt-4 text-center text-sm text-gray-600">
+            <p>Painel Administrativo - AgroCrédito</p>
+            <p className="mt-1">Para teste: admin@agricredit.ao / admin123</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user has admin permissions
+  if (user.userType !== "admin" && user.userType !== "financial_institution") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-red-600 mb-4">Acesso Negado</h1>
+          <p className="text-gray-600">Não tem permissões para aceder a esta página.</p>
+          <Button 
+            onClick={() => logout.mutate()}
+            variant="outline" 
+            className="mt-4"
+          >
+            Fazer Login com Outra Conta
+          </Button>
+        </div>
+      </div>
+    );
+  }
 
   const handleApprove = (application: CreditApplication) => {
     updateApplicationStatus.mutate({

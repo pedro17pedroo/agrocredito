@@ -42,13 +42,12 @@ function Router() {
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
       
-      {!user ? (
+      {/* Root route always shows landing page */}
+      <Route path="/" component={Landing} />
+      
+      {/* Protected routes - only accessible when authenticated */}
+      {user && (
         <>
-          <Route path="/" component={Landing} />
-        </>
-      ) : (
-        <>
-          <Route path="/" component={user.userType === "admin" || user.userType === "financial_institution" ? AdminDashboard : Dashboard} />
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/credit-application" component={CreditApplication} />
           <Route path="/reports" component={Reports} />
