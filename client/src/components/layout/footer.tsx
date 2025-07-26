@@ -48,14 +48,20 @@ export default function Footer() {
                 </button>
               </li>
               <li>
-                <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                <button 
+                  onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Gestão de Contas
-                </Link>
+                </button>
               </li>
               <li>
-                <Link href="/dashboard" className="text-gray-300 hover:text-white transition-colors">
+                <button 
+                  onClick={() => document.getElementById('benefits')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="text-gray-300 hover:text-white transition-colors"
+                >
                   Relatórios Financeiros
-                </Link>
+                </button>
               </li>
             </ul>
           </div>
