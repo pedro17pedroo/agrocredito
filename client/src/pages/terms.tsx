@@ -2,16 +2,18 @@ import { ArrowLeft, Shield, AlertTriangle, Users, FileText } from "lucide-react"
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLocation } from "wouter";
-import { useAuth } from "@/hooks/use-auth";
+
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
 export default function Terms() {
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
+  
+  // Check if user is logged in without using the auth hook to avoid loading issues
+  const isLoggedIn = !!localStorage.getItem("auth_token");
 
   const handleBack = () => {
-    if (user) {
+    if (isLoggedIn) {
       setLocation("/dashboard");
     } else {
       setLocation("/");
@@ -20,7 +22,7 @@ export default function Terms() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {!user && <Navbar />}
+      {!isLoggedIn && <Navbar />}
       
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -264,7 +266,7 @@ export default function Terms() {
         </div>
       </div>
 
-      {!user && <Footer />}
+      {!isLoggedIn && <Footer />}
     </div>
   );
 }

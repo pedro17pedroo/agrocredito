@@ -13,11 +13,13 @@ import { useToast } from "@/hooks/use-toast";
 
 export default function Contact() {
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
   const { toast } = useToast();
+  
+  // Check if user is logged in without using the auth hook to avoid loading issues
+  const isLoggedIn = !!localStorage.getItem("auth_token");
   const [formData, setFormData] = useState({
     name: '',
-    email: user?.email || '',
+    email: '',
     phone: '',
     subject: '',
     message: ''
@@ -25,7 +27,7 @@ export default function Contact() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleBack = () => {
-    if (user) {
+    if (isLoggedIn) {
       setLocation("/dashboard");
     } else {
       setLocation("/");
@@ -56,7 +58,7 @@ export default function Contact() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {!user && <Navbar />}
+      {!isLoggedIn && <Navbar />}
       
       <div className="py-8">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -245,7 +247,7 @@ export default function Contact() {
         </div>
       </div>
 
-      {!user && <Footer />}
+      {!isLoggedIn && <Footer />}
     </div>
   );
 }

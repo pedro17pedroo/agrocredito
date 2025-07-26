@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import { useLocation } from "wouter";
 import { useState } from "react";
-import { useAuth } from "@/hooks/use-auth";
+
 import Navbar from "@/components/layout/navbar";
 import Footer from "@/components/layout/footer";
 
@@ -61,8 +61,10 @@ const faqs = [
 
 export default function FAQ() {
   const [, setLocation] = useLocation();
-  const { user } = useAuth();
   const [openItems, setOpenItems] = useState<number[]>([]);
+  
+  // Check if user is logged in without using the auth hook to avoid loading issues
+  const isLoggedIn = !!localStorage.getItem("auth_token");
 
   const toggleItem = (index: number) => {
     setOpenItems(prev => 
@@ -73,7 +75,7 @@ export default function FAQ() {
   };
 
   const handleBack = () => {
-    if (user) {
+    if (isLoggedIn) {
       setLocation("/dashboard");
     } else {
       setLocation("/");
@@ -82,7 +84,7 @@ export default function FAQ() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {!user && <Navbar />}
+      {!isLoggedIn && <Navbar />}
       
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -152,7 +154,7 @@ export default function FAQ() {
         </div>
       </div>
 
-      {!user && <Footer />}
+      {!isLoggedIn && <Footer />}
     </div>
   );
 }
