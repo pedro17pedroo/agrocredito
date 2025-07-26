@@ -1,0 +1,312 @@
+Product Requirements Document (PRD) - AgriCredit
+1. Visão Geral do Produto
+O AgroCrédito é uma aplicação web inovadora desenvolvida para facilitar o acesso ao crédito para agricultores e empresas agrícolas, promovendo uma gestão financeira eficiente e personalizada. A ferramenta visa simplificar o processo de solicitação e gestão de financiamento, oferecendo uma plataforma intuitiva, segura e adaptada às necessidades específicas do setor agrícola. Com uma interface amigável e design moderno, o sistema utiliza cores atraentes, com ênfase no verde, representando a essência do setor agrícola.
+
+2. Objetivos do Produto
+
+Acessibilidade ao Crédito: Permitir que agricultores e empresas agrícolas solicitem financiamentos de forma rápida e segura.
+Gestão Financeira Eficiente: Oferecer ferramentas para simulação de crédito, visualização de solicitações e gestão de contas.
+Usabilidade: Criar uma experiência intuitiva, considerando a baixa literacia digital de alguns utilizadores.
+Segurança: Garantir a proteção de dados sensíveis com autenticação robusta e criptografia.
+Escalabilidade: Suportar o crescimento do número de utilizadores e transações sem comprometer o desempenho.
+
+
+3. Público-Alvo
+
+Agricultores: Pequenos e médios produtores agrícolas que necessitam de financiamento para projetos.
+Empresas Agrícolas: Organizações do setor que buscam crédito para expansão ou operações.
+Instituições Financeiras: Entidades que analisam, aprovam ou rejeitam solicitações de crédito.
+
+
+4. Requisitos Funcionais (RF)
+
+
+
+Código
+Requisito
+Descrição
+
+
+
+RF01
+Registo de Utilizadores
+O sistema deve permitir o registo de agricultores, empresas agrícolas e instituições financeiras, capturando informações como nome, BI, NIF, telefone e e-mail.
+
+
+RF02
+Autenticação
+O sistema deve implementar autenticação segura para acesso às funcionalidades.
+
+
+RF03
+Solicitação de Crédito
+Permitir que agricultores e empresas submetam pedidos de crédito com informações detalhadas do projeto agrícola.
+
+
+RF04
+Análise de Crédito
+Automatizar a análise de crédito com base em dados financeiros e histórico do solicitante.
+
+
+RF05
+Aprovação/Rejeição de Crédito
+Notificar utilizadores sobre a decisão da solicitação, com justificativas em caso de rejeição.
+
+
+RF06
+Simulação de Financiamento
+Ferramenta para simular cenários de financiamento, incluindo montante, taxa de juros e prazo.
+
+
+RF07
+Listagem de Solicitações
+Exibir todas as solicitações de crédito do utilizador, com estados (pendente, aprovado, rejeitado).
+
+
+RF08
+Gestão de Contas
+Permitir visualização de saldo devedor, pagamentos realizados e próximas parcelas.
+
+
+RF09
+Notificações e Alertas
+Enviar notificações sobre prazos de pagamento, alterações no estado da solicitação e novas ofertas de crédito.
+
+
+RF10
+Exportação de Relatórios
+Permitir exportação de relatórios de crédito em formatos como PDF ou Excel.
+
+
+
+5. Requisitos Não Funcionais (RNF)
+
+
+
+Código
+Requisito
+Descrição
+
+
+
+RNF01
+Usabilidade
+Interface intuitiva, com design moderno e cores atraentes (ênfase no verde), adequada para utilizadores com baixa literacia digital.
+
+
+RNF02
+Desempenho
+Tempo de resposta inferior a 5 segundos para operações como listagem de solicitações e simulações.
+
+
+RNF03
+Segurança
+Autenticação robusta, criptografia em transações financeiras e armazenamento seguro de dados.
+
+
+RNF04
+Disponibilidade
+Sistema acessível 24/7, com alta disponibilidade para transações e consultas.
+
+
+RNF05
+Portabilidade
+Compatível com dispositivos como computadores, tablets e smartphones, com experiência consistente.
+
+
+RNF06
+Escalabilidade
+Suportar aumento de utilizadores e transações sem comprometer o desempenho.
+
+
+RNF07
+Compatibilidade
+Funcionar em navegadores (Chrome, Firefox, Safari) e sistemas operacionais (Windows, macOS, Android, iOS).
+
+
+RNF08
+Backup e Recuperação
+Realizar backups automáticos diários e permitir recuperação rápida em caso de falhas.
+
+
+
+6. Casos de Uso
+
+
+
+Código
+Caso de Uso
+Ator(es)
+Descrição
+
+
+
+UC01
+Registar Utilizador
+Utilizador
+Permite o registo com nome, BI, NIF, telefone e e-mail.
+
+
+UC02
+Solicitar Crédito
+Solicitante
+Submeter nova solicitação de crédito para projetos agrícolas.
+
+
+UC03
+Editar Solicitação de Crédito
+Solicitante
+Modificar informações de uma solicitação já registada.
+
+
+UC04
+Análise de Crédito
+Instituição Financeira
+Visualizar o status das concessões de crédito.
+
+
+UC05
+Aprovar/Rejeitar Solicitação
+Instituição Financeira
+Aprovar ou rejeitar solicitações com justificativas.
+
+
+UC06
+Gerar Relatórios
+Instituição Financeira
+Gerar relatórios sobre uso do sistema e status de transações.
+
+
+UC07
+Receber Notificações
+Sistema
+Enviar atualizações e alertas sobre prazos e transações.
+
+
+UC08
+Autenticar Utilizador
+Sistema
+Exigir login para acesso às funcionalidades.
+
+
+UC09
+Garantir Segurança de Dados
+Sistema
+Proteger dados com autenticação e criptografia.
+
+
+
+7. Arquitetura Técnica
+Tecnologias
+
+Frontend: ReactJS (com Vite para construção rápida), Tailwind CSS (para design moderno e responsivo).
+Backend: Node.js com Express (API RESTful).
+Banco de Dados: MySQL (para armazenamento de dados de utilizadores, solicitações e transações).
+Infraestrutura: Hospedagem em cloud (ex.: AWS, Azure) para garantir escalabilidade e disponibilidade.
+Segurança: JWT para autenticação, HTTPS para transações, criptografia AES-256 para dados sensíveis.
+
+Estrutura de Dados (Exemplo Simplificado)
+
+Tabela Utilizadores: id, nome, BI, NIF, telefone, email, senha (hash), tipo (agricultor, empresa, instituição).
+Tabela Solicitações: id, user_id, montante, prazo, taxa_juros, status, data_solicitação, justificativa.
+Tabela Transações: id, solicitação_id, valor_pago, data_pagamento, saldo_devedor.
+
+
+8. Design e Usabilidade
+
+Cores: Paleta com tons de verde (ex.: #4CAF50, #8BC34A) para refletir o setor agrícola, complementada por cores neutras (branco, cinza) para clareza.
+Interface: Design minimalista com botões grandes, textos claros e navegação simplificada.
+Acessibilidade: Suporte a diferentes tamanhos de tela (responsivo) e opções de alto contraste para facilitar o uso por agricultores com baixa literacia digital.
+Idioma: Interface em português, com possibilidade de expansão para outros idiomas no futuro.
+
+
+9. Fluxo do Utilizador
+
+Registo: O utilizador cria uma conta fornecendo informações pessoais (RF01, UC01).
+Autenticação: Faz login com e-mail e senha (RF02, UC08).
+Solicitação de Crédito: Submete um pedido com detalhes do projeto (RF03, UC02).
+Simulação: Usa a ferramenta de simulação para explorar opções de financiamento (RF06).
+Análise e Decisão: A instituição financeira analisa o pedido e notifica o utilizador (RF04, RF05, UC04, UC05).
+Gestão: O utilizador visualiza solicitações, gerencia contas e recebe notificações (RF07, RF08, RF09, UC07).
+Relatórios: Exporta relatórios em PDF ou Excel para acompanhamento (RF10, UC06).
+
+
+10. Cronograma Proposto
+
+
+
+Fase
+Descrição
+Duração Estimada
+
+
+
+Planejamento
+Definição de requisitos e arquitetura
+2 semanas
+
+
+Design
+Prototipagem da interface (UI/UX)
+3 semanas
+
+
+Desenvolvimento
+Implementação do frontend, backend e banco de dados
+8 semanas
+
+
+Testes
+Testes funcionais, de desempenho e segurança
+3 semanas
+
+
+Implantação
+Deploy em ambiente de produção
+1 semana
+
+
+Treinamento
+Capacitação de utilizadores e instituições
+2 semanas
+
+
+Duração Total Estimada: 19 semanas
+
+11. Indicadores de Sucesso
+
+Taxa de Adoção: 70% dos agricultores-alvo registados no primeiro ano.
+Satisfação do Utilizador: NPS (Net Promoter Score) acima de 80.
+Tempo de Resposta: 95% das operações com tempo de resposta inferior a 5 segundos.
+Segurança: Zero incidentes de violação de dados no primeiro ano.
+Volume de Transações: 1.000 solicitações de crédito processadas nos primeiros 6 meses.
+
+
+12. Riscos e Mitigações
+
+
+
+Risco
+Mitigação
+
+
+
+Baixa literacia digital dos utilizadores
+Interface simplificada e tutoriais interativos.
+
+
+Falhas de segurança
+Auditorias regulares e implementação de criptografia robusta.
+
+
+Sobrecarga do sistema
+Arquitetura escalável com monitoramento contínuo.
+
+
+Resistência à adoção
+Campanhas de sensibilização e parcerias com cooperativas agrícolas.
+
+
+
+13. Considerações Finais
+O AgriCredit será uma solução transformadora para o setor agrícola, promovendo inclusão financeira e eficiência na gestão de crédito. A combinação de uma interface amigável, tecnologias modernas e foco nas necessidades dos agricultores garantirá um impacto positivo e sustentável.
