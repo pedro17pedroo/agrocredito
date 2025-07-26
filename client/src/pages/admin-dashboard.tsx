@@ -149,8 +149,7 @@ export default function AdminDashboard() {
           <div className="bg-white rounded-lg shadow-lg border">
             <LoginForm 
               onSuccess={() => {
-                // User will be redirected automatically after login
-                window.location.reload();
+                // Redirection is handled automatically in useLogin hook
               }}
               onSwitchToRegister={() => {
                 // Not needed for admin login

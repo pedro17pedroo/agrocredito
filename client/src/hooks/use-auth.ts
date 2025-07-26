@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useToast } from "@/hooks/use-toast";
+import { useLocation } from "wouter";
 
 interface User {
   id: string;
@@ -54,6 +55,7 @@ export function useAuth() {
 export function useLogin() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   return useMutation({
     mutationFn: async ({ loginIdentifier, password }: { loginIdentifier: string; password: string }) => {
@@ -74,6 +76,13 @@ export function useLogin() {
         title: "Login realizado com sucesso",
         description: `Bem-vindo, ${data.user.fullName}!`,
       });
+
+      // Redirect based on user type
+      if (data.user.userType === "admin" || data.user.userType === "financial_institution") {
+        setLocation("/admin-dashboard");
+      } else {
+        setLocation("/dashboard");
+      }
     },
     onError: (error: Error) => {
       toast({
@@ -88,6 +97,7 @@ export function useLogin() {
 export function useRegister() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   return useMutation({
     mutationFn: async (userData: any) => {
@@ -105,6 +115,13 @@ export function useRegister() {
         title: "Conta criada com sucesso",
         description: `Bem-vindo ao AgroCrédito, ${data.user.fullName}!`,
       });
+
+      // Redirect based on user type
+      if (data.user.userType === "admin" || data.user.userType === "financial_institution") {
+        setLocation("/admin-dashboard");
+      } else {
+        setLocation("/dashboard");
+      }
     },
     onError: (error: Error) => {
       toast({
