@@ -25,6 +25,27 @@ Preferred communication style: Simple, everyday language.
   - ✅ **Segurança**: JWT, bcrypt, validação Angola (BI, NIF, telefone)
   - ✅ **Interface**: Design verde/agrícola responsivo com componentes Shadcn/UI
 
+## Utilizadores de Teste para Demonstração
+
+### 👨‍💼 Administrador do Sistema
+- **Email**: admin@agricredit.ao
+- **Telefone**: +244900000000
+- **Palavra-passe**: admin123
+- **Acesso**: Painel completo de administração, gestão de utilizadores, aprovação de créditos
+
+### 🌾 Agricultor (João Manuel dos Santos)
+- **Email**: joao.santos@gmail.com
+- **Telefone**: +244923456789
+- **Palavra-passe**: farmer123
+- **Acesso**: Dashboard agricultor, solicitações de crédito, simulador, relatórios
+- **Dados de teste**: 5 solicitações criadas (pending, approved, rejected, under_review)
+
+### 🏦 Instituição Financeira (Maria Fernanda Silva)
+- **Email**: maria.silva@bai.ao
+- **Telefone**: +244934567890
+- **Palavra-passe**: bank123
+- **Acesso**: Painel para análise e aprovação/rejeição de solicitações de crédito
+
 ## System Architecture
 
 ### Frontend Architecture

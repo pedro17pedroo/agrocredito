@@ -250,6 +250,72 @@ export async function seedDatabase() {
       console.log("  ⏭️ Utilizador admin já existe");
     }
 
+    // 4. Create test farmer user
+    console.log("🌱 Criando utilizador agricultor de teste...");
+    const farmerPassword = await bcrypt.hash("farmer123", 10);
+    const farmerProfileId = profileIds["Agricultor"];
+    
+    const farmerUser: InsertUser = {
+      fullName: "João Manuel dos Santos",
+      bi: "001234567LA041",
+      nif: "5417037682",
+      phone: "+244923456789",
+      email: "joao.santos@gmail.com",
+      password: farmerPassword,
+      userType: "farmer",
+      profileId: farmerProfileId,
+      isActive: true,
+    };
+
+    const [existingFarmer] = await db
+      .select()
+      .from(users)
+      .where(eq(users.phone, farmerUser.phone))
+      .limit(1);
+
+    if (!existingFarmer) {
+      await db.insert(users).values(farmerUser);
+      console.log("  ✅ Utilizador agricultor criado com sucesso!");
+      console.log("  📧 Email: joao.santos@gmail.com");
+      console.log("  📱 Telefone: +244923456789");
+      console.log("  🔐 Palavra-passe: farmer123");
+    } else {
+      console.log("  ⏭️ Utilizador agricultor já existe");
+    }
+
+    // 5. Create test financial institution user
+    console.log("🏦 Criando utilizador instituição financeira de teste...");
+    const bankPassword = await bcrypt.hash("bank123", 10);
+    const bankProfileId = profileIds["Instituição Financeira"];
+    
+    const bankUser: InsertUser = {
+      fullName: "Maria Fernanda Silva",
+      bi: "002345678LA042",
+      nif: "5417037683",
+      phone: "+244934567890",
+      email: "maria.silva@bai.ao",
+      password: bankPassword,
+      userType: "financial_institution",
+      profileId: bankProfileId,
+      isActive: true,
+    };
+
+    const [existingBank] = await db
+      .select()
+      .from(users)
+      .where(eq(users.phone, bankUser.phone))
+      .limit(1);
+
+    if (!existingBank) {
+      await db.insert(users).values(bankUser);
+      console.log("  ✅ Utilizador instituição financeira criado com sucesso!");
+      console.log("  📧 Email: maria.silva@bai.ao");
+      console.log("  📱 Telefone: +244934567890");
+      console.log("  🔐 Palavra-passe: bank123");
+    } else {
+      console.log("  ⏭️ Utilizador instituição financeira já existe");
+    }
+
     console.log("🎉 Seed da base de dados concluído com sucesso!");
     
   } catch (error) {
