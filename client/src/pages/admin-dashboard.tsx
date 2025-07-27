@@ -521,11 +521,13 @@ export default function AdminDashboard() {
   const renderUsersManagement = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">Gestão de Utilizadores</h2>
-        <Button onClick={() => setShowCreateUserDialog(true)}>
-          <UserPlus className="w-4 h-4 mr-2" />
-          Criar Utilizador
-        </Button>
+        <h2 className="text-2xl font-bold">{user?.userType === 'admin' ? 'Gestão de Utilizadores' : 'Utilizadores'}</h2>
+        {user?.userType === 'admin' && (
+          <Button onClick={() => setShowCreateUserDialog(true)}>
+            <UserPlus className="w-4 h-4 mr-2" />
+            Criar Utilizador
+          </Button>
+        )}
       </div>
 
       <Card>
@@ -538,7 +540,7 @@ export default function AdminDashboard() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Data de Criação</TableHead>
-                <TableHead>Ações</TableHead>
+                {user?.userType === 'admin' && <TableHead>Ações</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -575,9 +577,11 @@ export default function AdminDashboard() {
                   </TableCell>
                   <TableCell>
                     <div className="flex space-x-2">
-                      <Button variant="ghost" size="sm">
-                        <Edit className="w-4 h-4" />
-                      </Button>
+                      {user?.userType === 'admin' && (
+                        <Button variant="ghost" size="sm">
+                          <Edit className="w-4 h-4" />
+                        </Button>
+                      )}
                       <Button variant="ghost" size="sm">
                         <Eye className="w-4 h-4" />
                       </Button>
@@ -589,13 +593,13 @@ export default function AdminDashboard() {
           </Table>
         </CardContent>
       </Card>
-      {renderCreateUserDialog()}
+      {user?.userType === 'admin' && renderCreateUserDialog()}
     </div>
   );
 
   const renderProfilesManagement = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">Gestão de Perfis e Permissões</h2>
+      <h2 className="text-2xl font-bold">{user?.userType === 'admin' ? 'Gestão de Perfis e Permissões' : 'Perfis e Permissões'}</h2>
       
       <Tabs defaultValue="profiles">
         <TabsList>
@@ -616,7 +620,7 @@ export default function AdminDashboard() {
                     <TableHead>Descrição</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Sistema</TableHead>
-                    <TableHead>Ações</TableHead>
+                    {user?.userType === 'admin' && <TableHead>Ações</TableHead>}
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -632,18 +636,20 @@ export default function AdminDashboard() {
                       <TableCell>
                         {profile.isSystem && <Badge variant="outline">Sistema</Badge>}
                       </TableCell>
-                      <TableCell>
-                        <div className="flex space-x-2">
-                          <Button variant="ghost" size="sm">
-                            <Edit className="w-4 h-4" />
-                          </Button>
-                          {!profile.isSystem && (
+                      {user?.userType === 'admin' && (
+                        <TableCell>
+                          <div className="flex space-x-2">
                             <Button variant="ghost" size="sm">
-                              <Trash2 className="w-4 h-4" />
+                              <Edit className="w-4 h-4" />
                             </Button>
-                          )}
-                        </div>
-                      </TableCell>
+                            {!profile.isSystem && (
+                              <Button variant="ghost" size="sm">
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </TableCell>
+                      )}
                     </TableRow>
                   ))}
                 </TableBody>
