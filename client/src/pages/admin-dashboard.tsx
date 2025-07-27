@@ -217,7 +217,7 @@ export default function AdminDashboard() {
 
   const sidebarItems = [
     { id: 'dashboard', label: 'Painel Principal', icon: Home },
-    { id: 'users', label: 'Gestão de Utilizadores', icon: Users },
+    { id: 'users', label: user?.userType === 'admin' ? 'Gestão de Utilizadores' : 'Utilizadores', icon: Users },
     { id: 'applications', label: 'Solicitações de Crédito', icon: FileText },
     { id: 'accounts', label: 'Contas de Crédito', icon: CreditCard },
     { id: 'reports', label: 'Relatórios', icon: BarChart3 },
@@ -229,7 +229,9 @@ export default function AdminDashboard() {
       <div className="flex items-center justify-between h-16 px-4 border-b border-agri-primary">
         <div className="flex items-center">
           <Sprout className="w-8 h-8 mr-2" />
-          <span className="text-lg font-bold">Admin AgroCrédito</span>
+          <span className="text-lg font-bold">
+            {user?.userType === 'admin' ? 'Admin AgroCrédito' : 'Instituição Financeira'}
+          </span>
         </div>
         <Button
           variant="ghost"

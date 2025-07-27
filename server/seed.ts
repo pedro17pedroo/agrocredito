@@ -70,6 +70,7 @@ const defaultProfiles: { profile: InsertProfile; permissions: string[] }[] = [
       isSystem: true,
     },
     permissions: [
+      "users.read",
       "applications.read",
       "applications.approve",
       "applications.reject",
@@ -83,6 +84,8 @@ const defaultProfiles: { profile: InsertProfile; permissions: string[] }[] = [
       "reports.export",
       "notifications.read",
       "notifications.create",
+      "admin.profiles",
+      "admin.permissions",
     ],
   },
   {

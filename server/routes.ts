@@ -587,10 +587,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all users (admin only)
+  // Get all users (admin and financial institutions)
   app.get("/api/admin/users", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.userType !== "admin") {
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
         return res.status(403).json({ message: "Acesso negado" });
       }
       
@@ -663,10 +663,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all profiles (admin only)
+  // Get all profiles (admin and financial institutions)
   app.get("/api/admin/profiles", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.userType !== "admin") {
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
         return res.status(403).json({ message: "Acesso negado" });
       }
       
@@ -678,10 +678,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all permissions (admin only)
+  // Get all permissions (admin and financial institutions)
   app.get("/api/admin/permissions", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.userType !== "admin") {
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
         return res.status(403).json({ message: "Acesso negado" });
       }
       
@@ -693,10 +693,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get all accounts (admin only)
+  // Get all accounts (admin and financial institutions)
   app.get("/api/admin/accounts", authenticateToken, async (req: any, res) => {
     try {
-      if (req.user.userType !== "admin") {
+      if (req.user.userType !== "admin" && req.user.userType !== "financial_institution") {
         return res.status(403).json({ message: "Acesso negado" });
       }
       
