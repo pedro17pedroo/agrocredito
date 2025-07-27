@@ -4,6 +4,7 @@ import { QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAuth } from "./hooks/use-auth";
+import { PermissionGate } from "@/components/PermissionGate";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
@@ -49,9 +50,21 @@ function Router() {
       {user && (
         <>
           <Route path="/dashboard" component={Dashboard} />
-          <Route path="/credit-application" component={CreditApplication} />
-          <Route path="/reports" component={Reports} />
-          <Route path="/profile-management" component={ProfileManagement} />
+          <Route path="/credit-application">
+            <PermissionGate permission="credit_applications.create" fallback={<NotFound />}>
+              <CreditApplication />
+            </PermissionGate>
+          </Route>
+          <Route path="/reports">
+            <PermissionGate permission="reports.read" fallback={<NotFound />}>
+              <Reports />
+            </PermissionGate>
+          </Route>
+          <Route path="/profile-management">
+            <PermissionGate permission="admin.profiles" fallback={<NotFound />}>
+              <ProfileManagement />
+            </PermissionGate>
+          </Route>
         </>
       )}
       <Route component={NotFound} />

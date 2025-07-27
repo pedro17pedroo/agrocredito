@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { Sprout, Plus, Calculator, Download, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { PermissionGate } from "@/components/PermissionGate";
 import StatsCards from "@/components/dashboard/stats-cards";
 import ApplicationsList from "@/components/dashboard/applications-list";
 import NotificationCenter from "@/components/notifications/notification-center";
@@ -72,15 +73,17 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <Link href="/credit-application">
-            <Button className="w-full bg-agri-primary text-white p-6 rounded-xl hover:bg-agri-dark transition-colors text-left group h-auto">
-              <div className="flex flex-col items-start">
-                <Plus className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-xl font-bold mb-2 text-left">Nova Solicitação</h3>
-                <p className="text-agri-light text-left">Solicite um novo crédito para o seu projeto agrícola</p>
-              </div>
-            </Button>
-          </Link>
+          <PermissionGate permission="credit_applications.create">
+            <Link href="/credit-application">
+              <Button className="w-full bg-agri-primary text-white p-6 rounded-xl hover:bg-agri-dark transition-colors text-left group h-auto">
+                <div className="flex flex-col items-start">
+                  <Plus className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="text-xl font-bold mb-2 text-left">Nova Solicitação</h3>
+                  <p className="text-agri-light text-left">Solicite um novo crédito para o seu projeto agrícola</p>
+                </div>
+              </Button>
+            </Link>
+          </PermissionGate>
 
           <Link href="/simulator">
             <Button 
@@ -95,18 +98,20 @@ export default function Dashboard() {
             </Button>
           </Link>
 
-          <Link href="/reports">
-            <Button 
-              variant="outline"
-              className="w-full border-2 border-agri-secondary text-agri-secondary p-6 rounded-xl hover:bg-agri-secondary hover:text-white transition-colors text-left group h-auto"
-            >
-              <div className="flex flex-col items-start">
-                <Download className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
-                <h3 className="text-xl font-bold mb-2 text-left">Relatórios</h3>
-                <p className="opacity-80 text-left">Descarregue os seus relatórios financeiros</p>
-              </div>
-            </Button>
-          </Link>
+          <PermissionGate permission="reports.read">
+            <Link href="/reports">
+              <Button 
+                variant="outline"
+                className="w-full border-2 border-agri-secondary text-agri-secondary p-6 rounded-xl hover:bg-agri-secondary hover:text-white transition-colors text-left group h-auto"
+              >
+                <div className="flex flex-col items-start">
+                  <Download className="w-8 h-8 mb-4 group-hover:scale-110 transition-transform" />
+                  <h3 className="text-xl font-bold mb-2 text-left">Relatórios</h3>
+                  <p className="opacity-80 text-left">Descarregue os seus relatórios financeiros</p>
+                </div>
+              </Button>
+            </Link>
+          </PermissionGate>
         </div>
 
         {/* Applications List */}

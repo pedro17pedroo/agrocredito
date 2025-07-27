@@ -183,6 +183,21 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(accounts.createdAt));
   }
 
+  async getProfilePermissions(profileId: string): Promise<Permission[]> {
+    return await db
+      .select({
+        id: permissions.id,
+        name: permissions.name,
+        description: permissions.description,
+        module: permissions.module,
+        action: permissions.action,
+        createdAt: permissions.createdAt,
+      })
+      .from(permissions)
+      .innerJoin(profilePermissions, eq(permissions.id, profilePermissions.permissionId))
+      .where(eq(profilePermissions.profileId, profileId));
+  }
+
   async getAccountById(id: string): Promise<Account | undefined> {
     const [account] = await db.select().from(accounts).where(eq(accounts.id, id));
     return account;

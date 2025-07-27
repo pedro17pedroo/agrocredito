@@ -708,6 +708,28 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get user permissions
+  app.get("/api/user/permissions", authenticateToken, async (req: any, res) => {
+    try {
+      const userId = req.user.userId;
+      
+      // Get user's profile
+      const userData = await storage.getUserById(userId);
+      
+      if (!userData || !userData.profileId) {
+        return res.json([]);
+      }
+      
+      // Get permissions for the user's profile
+      const userPermissions = await storage.getProfilePermissions(userData.profileId);
+      
+      res.json(userPermissions);
+    } catch (error) {
+      console.error("Get user permissions error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { useToast } from "@/hooks/use-toast";
+import { usePermissions } from "@/hooks/use-permissions";
+import { PermissionGate } from "@/components/PermissionGate";
 import { apiRequest } from "@/lib/queryClient";
 import { formatKwanza, getProjectTypeLabel, getStatusLabel } from "@/lib/angola-utils";
 import { format } from "date-fns";
@@ -31,6 +33,7 @@ export default function AdminDashboard() {
   const { user } = useAuth();
   const logout = useLogout();
   const { toast } = useToast();
+  const { hasPermission } = usePermissions();
   const queryClient = useQueryClient();
   
   // State hooks
@@ -215,14 +218,18 @@ export default function AdminDashboard() {
   const pendingApplications = allApplications.filter(app => app.status === "pending");
   const underReviewApplications = allApplications.filter(app => app.status === "under_review");
 
-  const sidebarItems = [
-    { id: 'dashboard', label: 'Painel Principal', icon: Home },
-    { id: 'users', label: user?.userType === 'admin' ? 'Gestão de Utilizadores' : 'Utilizadores', icon: Users },
-    { id: 'applications', label: 'Solicitações de Crédito', icon: FileText },
-    { id: 'accounts', label: 'Contas de Crédito', icon: CreditCard },
-    { id: 'reports', label: 'Relatórios', icon: BarChart3 },
-    { id: 'profiles', label: 'Perfis e Permissões', icon: Shield },
+  const allSidebarItems = [
+    { id: 'dashboard', label: 'Painel Principal', icon: Home, permission: null },
+    { id: 'users', label: hasPermission('users.create') ? 'Gestão de Utilizadores' : 'Utilizadores', icon: Users, permission: 'users.read' },
+    { id: 'applications', label: 'Solicitações de Crédito', icon: FileText, permission: 'credit_applications.read' },
+    { id: 'accounts', label: 'Contas de Crédito', icon: CreditCard, permission: 'accounts.read' },
+    { id: 'reports', label: 'Relatórios', icon: BarChart3, permission: 'reports.read' },
+    { id: 'profiles', label: 'Perfis e Permissões', icon: Shield, permission: 'admin.read' },
   ];
+  
+  const sidebarItems = allSidebarItems.filter(item => 
+    !item.permission || hasPermission(item.permission)
+  );
 
   const renderSidebar = () => (
     <div className={`fixed inset-y-0 left-0 z-50 w-64 bg-agri-dark text-white transform ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'} transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0`}>
@@ -269,7 +276,9 @@ export default function AdminDashboard() {
           <div className="text-sm font-medium">{user.fullName}</div>
           <div className="text-xs text-agri-light">{user.email}</div>
           <Badge variant="secondary" className="mt-1 bg-agri-secondary text-agri-dark">
-            {user.userType === "admin" ? "Administrador" : "Instituição Financeira"}
+            {user.userType === "admin" ? "Administrador" : 
+             user.userType === "financial_institution" ? "Instituição Financeira" :
+             "Utilizador"}
           </Badge>
         </div>
         <Button
@@ -521,13 +530,13 @@ export default function AdminDashboard() {
   const renderUsersManagement = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold">{user?.userType === 'admin' ? 'Gestão de Utilizadores' : 'Utilizadores'}</h2>
-        {user?.userType === 'admin' && (
+        <h2 className="text-2xl font-bold">{hasPermission('users.create') ? 'Gestão de Utilizadores' : 'Utilizadores'}</h2>
+        <PermissionGate permission="users.create">
           <Button onClick={() => setShowCreateUserDialog(true)}>
             <UserPlus className="w-4 h-4 mr-2" />
             Criar Utilizador
           </Button>
-        )}
+        </PermissionGate>
       </div>
 
       <Card>
@@ -540,7 +549,9 @@ export default function AdminDashboard() {
                 <TableHead>Tipo</TableHead>
                 <TableHead>Estado</TableHead>
                 <TableHead>Data de Criação</TableHead>
-                {user?.userType === 'admin' && <TableHead>Ações</TableHead>}
+                <PermissionGate anyPermissions={['users.update', 'users.delete']}>
+                  <TableHead>Ações</TableHead>
+                </PermissionGate>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -575,31 +586,35 @@ export default function AdminDashboard() {
                   <TableCell>
                     {userData.createdAt ? format(new Date(userData.createdAt), "dd/MM/yyyy") : '-'}
                   </TableCell>
-                  <TableCell>
-                    <div className="flex space-x-2">
-                      {user?.userType === 'admin' && (
+                  <PermissionGate anyPermissions={['users.update', 'users.delete']}>
+                    <TableCell>
+                      <div className="flex space-x-2">
+                        <PermissionGate permission="users.update">
+                          <Button variant="ghost" size="sm">
+                            <Edit className="w-4 h-4" />
+                          </Button>
+                        </PermissionGate>
                         <Button variant="ghost" size="sm">
-                          <Edit className="w-4 h-4" />
+                          <Eye className="w-4 h-4" />
                         </Button>
-                      )}
-                      <Button variant="ghost" size="sm">
-                        <Eye className="w-4 h-4" />
-                      </Button>
-                    </div>
-                  </TableCell>
+                      </div>
+                    </TableCell>
+                  </PermissionGate>
                 </TableRow>
               ))}
             </TableBody>
           </Table>
         </CardContent>
       </Card>
-      {user?.userType === 'admin' && renderCreateUserDialog()}
+      <PermissionGate permission="users.create">
+        {renderCreateUserDialog()}
+      </PermissionGate>
     </div>
   );
 
   const renderProfilesManagement = () => (
     <div className="space-y-6">
-      <h2 className="text-2xl font-bold">{user?.userType === 'admin' ? 'Gestão de Perfis e Permissões' : 'Perfis e Permissões'}</h2>
+      <h2 className="text-2xl font-bold">{hasPermission('admin.profiles') ? 'Gestão de Perfis e Permissões' : 'Perfis e Permissões'}</h2>
       
       <Tabs defaultValue="profiles">
         <TabsList>
@@ -620,7 +635,9 @@ export default function AdminDashboard() {
                     <TableHead>Descrição</TableHead>
                     <TableHead>Estado</TableHead>
                     <TableHead>Sistema</TableHead>
-                    {user?.userType === 'admin' && <TableHead>Ações</TableHead>}
+                    <PermissionGate anyPermissions={['admin.profiles', 'admin.permissions']}>
+                      <TableHead>Ações</TableHead>
+                    </PermissionGate>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -636,20 +653,24 @@ export default function AdminDashboard() {
                       <TableCell>
                         {profile.isSystem && <Badge variant="outline">Sistema</Badge>}
                       </TableCell>
-                      {user?.userType === 'admin' && (
+                      <PermissionGate anyPermissions={['admin.profiles', 'admin.permissions']}>
                         <TableCell>
                           <div className="flex space-x-2">
-                            <Button variant="ghost" size="sm">
-                              <Edit className="w-4 h-4" />
-                            </Button>
-                            {!profile.isSystem && (
+                            <PermissionGate permission="admin.profiles">
                               <Button variant="ghost" size="sm">
-                                <Trash2 className="w-4 h-4" />
+                                <Edit className="w-4 h-4" />
                               </Button>
+                            </PermissionGate>
+                            {!profile.isSystem && (
+                              <PermissionGate permission="admin.profiles">
+                                <Button variant="ghost" size="sm">
+                                  <Trash2 className="w-4 h-4" />
+                                </Button>
+                              </PermissionGate>
                             )}
                           </div>
                         </TableCell>
-                      )}
+                      </PermissionGate>
                     </TableRow>
                   ))}
                 </TableBody>

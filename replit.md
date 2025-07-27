@@ -10,6 +10,15 @@ Preferred communication style: Simple, everyday language.
 
 ## Recent Changes
 
+- **July 27, 2025**: **SISTEMA DE PERMISSÕES COMPLETO IMPLEMENTADO** 🔐
+  - ✅ **PermissionGate Component**: Controlo granular de renderização baseado em permissões
+  - ✅ **usePermissions Hook**: Hook para verificação de permissões em tempo real
+  - ✅ **API de Permissões**: Endpoint `/api/user/permissions` para carregar permissões do utilizador
+  - ✅ **Filtragem de Interface**: Menus, botões e funcionalidades filtradas por permissão
+  - ✅ **Rotas Protegidas**: Sistema de proteção de rotas baseado em permissões
+  - ✅ **Admin vs Instituição Financeira**: Interface diferenciada baseada nas permissões de cada perfil
+  - ✅ **Todos os Dashboards**: Sistema aplicado em admin-dashboard, dashboard principal e rotas
+
 - **July 27, 2025**: **PROJETO COMPLETO E FUNCIONANDO EM PRODUÇÃO** 🎉
   - ✅ **100% do PRD implementado**: Todos os 10 requisitos funcionais e 8 não-funcionais atendidos
   - ✅ **Migração bem-sucedida**: Projeto completamente migrado do Replit Agent para Replit
