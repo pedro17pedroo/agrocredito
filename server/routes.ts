@@ -594,20 +594,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Acesso negado" });
       }
       
-      // Get all users without password
-      const allUsers = await db.select({
-        id: users.id,
-        fullName: users.fullName,
-        bi: users.bi,
-        nif: users.nif,
-        phone: users.phone,
-        email: users.email,
-        userType: users.userType,
-        profileId: users.profileId,
-        isActive: users.isActive,
-        createdAt: users.createdAt,
-        updatedAt: users.updatedAt,
-      }).from(users);
+      // Get all users without password using storage
+      const allUsers = await storage.getAllUsers();
       
       res.json(allUsers);
     } catch (error) {

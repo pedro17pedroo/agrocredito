@@ -30,6 +30,8 @@ import { eq, desc, and } from "drizzle-orm";
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
+  getUserById(id: string): Promise<User | undefined>;
+  getAllUsers(): Promise<User[]>;
   getUserByPhone(phone: string): Promise<User | undefined>;
   getUserByEmail(email: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
@@ -85,6 +87,18 @@ export class DatabaseStorage implements IStorage {
   async getUser(id: string): Promise<User | undefined> {
     const [user] = await db.select().from(users).where(eq(users.id, id));
     return user;
+  }
+
+  async getUserById(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user;
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .orderBy(desc(users.createdAt));
   }
 
   async getUserByPhone(phone: string): Promise<User | undefined> {
@@ -183,20 +197,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(accounts.createdAt));
   }
 
-  async getProfilePermissions(profileId: string): Promise<Permission[]> {
-    return await db
-      .select({
-        id: permissions.id,
-        name: permissions.name,
-        description: permissions.description,
-        module: permissions.module,
-        action: permissions.action,
-        createdAt: permissions.createdAt,
-      })
-      .from(permissions)
-      .innerJoin(profilePermissions, eq(permissions.id, profilePermissions.permissionId))
-      .where(eq(profilePermissions.profileId, profileId));
-  }
+
 
   async getAccountById(id: string): Promise<Account | undefined> {
     const [account] = await db.select().from(accounts).where(eq(accounts.id, id));

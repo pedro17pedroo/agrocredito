@@ -52,6 +52,20 @@ export default function AdminDashboard() {
     profileId: ''
   });
 
+  // User management state
+  const [userFilters, setUserFilters] = useState({
+    search: '',
+    userType: 'all',
+    isActive: 'all',
+    page: 1,
+    itemsPerPage: 10
+  });
+
+  const [sortConfig, setSortConfig] = useState({
+    key: 'createdAt',
+    direction: 'desc'
+  });
+
   // Query hooks - all must be called before any early returns
   const { data: allApplications = [], isLoading } = useQuery<CreditApplication[]>({
     queryKey: ["/api/admin/credit-applications"],
@@ -527,6 +541,48 @@ export default function AdminDashboard() {
     </div>
   );
 
+
+
+
+
+  // Filter and sort users
+  const filteredUsers = allUsers.filter(userData => {
+    const matchesSearch = userFilters.search === '' || 
+      userData.fullName.toLowerCase().includes(userFilters.search.toLowerCase()) ||
+      userData.email?.toLowerCase().includes(userFilters.search.toLowerCase()) ||
+      userData.phone.includes(userFilters.search) ||
+      userData.bi.toLowerCase().includes(userFilters.search.toLowerCase());
+    
+    const matchesType = userFilters.userType === 'all' || userData.userType === userFilters.userType;
+    const matchesActive = userFilters.isActive === 'all' || 
+      (userFilters.isActive === 'active' ? userData.isActive : !userData.isActive);
+    
+    return matchesSearch && matchesType && matchesActive;
+  });
+
+  // Sort users
+  const sortedUsers = [...filteredUsers].sort((a, b) => {
+    const aValue = a[sortConfig.key as keyof typeof a] || '';
+    const bValue = b[sortConfig.key as keyof typeof b] || '';
+    
+    if (sortConfig.direction === 'asc') {
+      return aValue > bValue ? 1 : -1;
+    }
+    return aValue < bValue ? 1 : -1;
+  });
+
+  // Paginate users
+  const totalPages = Math.ceil(sortedUsers.length / userFilters.itemsPerPage);
+  const startIndex = (userFilters.page - 1) * userFilters.itemsPerPage;
+  const paginatedUsers = sortedUsers.slice(startIndex, startIndex + userFilters.itemsPerPage);
+
+  const handleSort = (key: string) => {
+    setSortConfig(prev => ({
+      key,
+      direction: prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc'
+    }));
+  };
+
   const renderUsersManagement = () => (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -539,23 +595,191 @@ export default function AdminDashboard() {
         </PermissionGate>
       </div>
 
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Filtros de Pesquisa</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="search">Pesquisar</Label>
+              <Input
+                id="search"
+                placeholder="Nome, email, telefone ou BI..."
+                value={userFilters.search}
+                onChange={(e) => setUserFilters(prev => ({ ...prev, search: e.target.value, page: 1 }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="userType">Tipo de Utilizador</Label>
+              <Select value={userFilters.userType} onValueChange={(value) => setUserFilters(prev => ({ ...prev, userType: value, page: 1 }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Tipos</SelectItem>
+                  <SelectItem value="farmer">Agricultor</SelectItem>
+                  <SelectItem value="company">Empresa Agrícola</SelectItem>
+                  <SelectItem value="cooperative">Cooperativa</SelectItem>
+                  <SelectItem value="financial_institution">Instituição Financeira</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="isActive">Estado</Label>
+              <Select value={userFilters.isActive} onValueChange={(value) => setUserFilters(prev => ({ ...prev, isActive: value, page: 1 }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="active">Ativos</SelectItem>
+                  <SelectItem value="inactive">Inativos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="itemsPerPage">Itens por Página</Label>
+              <Select value={userFilters.itemsPerPage.toString()} onValueChange={(value) => setUserFilters(prev => ({ ...prev, itemsPerPage: parseInt(value), page: 1 }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-between items-center">
+            <p className="text-sm text-gray-600">
+              Mostrando {startIndex + 1}-{Math.min(startIndex + userFilters.itemsPerPage, sortedUsers.length)} de {sortedUsers.length} utilizadores
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => setUserFilters({ search: '', userType: 'all', isActive: 'all', page: 1, itemsPerPage: 10 })}
+            >
+              Limpar Filtros
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Filters */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg">Filtros de Pesquisa</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div>
+              <Label htmlFor="search">Pesquisar</Label>
+              <Input
+                id="search"
+                placeholder="Nome, email, telefone ou BI..."
+                value={userFilters.search}
+                onChange={(e) => setUserFilters(prev => ({ ...prev, search: e.target.value, page: 1 }))}
+              />
+            </div>
+            <div>
+              <Label htmlFor="userType">Tipo de Utilizador</Label>
+              <Select value={userFilters.userType} onValueChange={(value) => setUserFilters(prev => ({ ...prev, userType: value, page: 1 }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos os Tipos</SelectItem>
+                  <SelectItem value="farmer">Agricultor</SelectItem>
+                  <SelectItem value="company">Empresa Agrícola</SelectItem>
+                  <SelectItem value="cooperative">Cooperativa</SelectItem>
+                  <SelectItem value="financial_institution">Instituição Financeira</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="isActive">Estado</Label>
+              <Select value={userFilters.isActive} onValueChange={(value) => setUserFilters(prev => ({ ...prev, isActive: value, page: 1 }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos</SelectItem>
+                  <SelectItem value="active">Ativos</SelectItem>
+                  <SelectItem value="inactive">Inativos</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div>
+              <Label htmlFor="itemsPerPage">Itens por Página</Label>
+              <Select value={userFilters.itemsPerPage.toString()} onValueChange={(value) => setUserFilters(prev => ({ ...prev, itemsPerPage: parseInt(value), page: 1 }))}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="10">10</SelectItem>
+                  <SelectItem value="25">25</SelectItem>
+                  <SelectItem value="50">50</SelectItem>
+                  <SelectItem value="100">100</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-between items-center">
+            <p className="text-sm text-gray-600">
+              Mostrando {startIndex + 1}-{Math.min(startIndex + userFilters.itemsPerPage, sortedUsers.length)} de {sortedUsers.length} utilizadores
+            </p>
+            <Button
+              variant="outline"
+              onClick={() => setUserFilters({ search: '', userType: 'all', isActive: 'all', page: 1, itemsPerPage: 10 })}
+            >
+              Limpar Filtros
+            </Button>
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardContent className="p-0">
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Nome</TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => handleSort('fullName')}
+                >
+                  Nome {sortConfig.key === 'fullName' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </TableHead>
                 <TableHead>Email/Telefone</TableHead>
-                <TableHead>Tipo</TableHead>
-                <TableHead>Estado</TableHead>
-                <TableHead>Data de Criação</TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => handleSort('userType')}
+                >
+                  Tipo {sortConfig.key === 'userType' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => handleSort('isActive')}
+                >
+                  Estado {sortConfig.key === 'isActive' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </TableHead>
+                <TableHead 
+                  className="cursor-pointer hover:bg-gray-50"
+                  onClick={() => handleSort('createdAt')}
+                >
+                  Data de Criação {sortConfig.key === 'createdAt' && (sortConfig.direction === 'asc' ? '↑' : '↓')}
+                </TableHead>
                 <PermissionGate anyPermissions={['users.update', 'users.delete']}>
                   <TableHead>Ações</TableHead>
                 </PermissionGate>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {allUsers.map((userData) => (
+              {paginatedUsers.map((userData) => (
                 <TableRow key={userData.id}>
                   <TableCell>
                     <div>
@@ -606,6 +830,70 @@ export default function AdminDashboard() {
           </Table>
         </CardContent>
       </Card>
+
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <Card>
+          <CardContent className="p-4">
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  disabled={userFilters.page === 1}
+                  onClick={() => setUserFilters(prev => ({ ...prev, page: 1 }))}
+                >
+                  Primeira
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={userFilters.page === 1}
+                  onClick={() => setUserFilters(prev => ({ ...prev, page: prev.page - 1 }))}
+                >
+                  Anterior
+                </Button>
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                {Array.from({ length: Math.min(5, totalPages) }).map((_, i) => {
+                  const pageNumber = Math.max(1, userFilters.page - 2) + i;
+                  if (pageNumber <= totalPages) {
+                    return (
+                      <Button
+                        key={pageNumber}
+                        variant={pageNumber === userFilters.page ? "default" : "outline"}
+                        onClick={() => setUserFilters(prev => ({ ...prev, page: pageNumber }))}
+                      >
+                        {pageNumber}
+                      </Button>
+                    );
+                  }
+                  return null;
+                })}
+              </div>
+              
+              <div className="flex items-center space-x-2">
+                <Button
+                  variant="outline"
+                  disabled={userFilters.page === totalPages}
+                  onClick={() => setUserFilters(prev => ({ ...prev, page: prev.page + 1 }))}
+                >
+                  Próxima
+                </Button>
+                <Button
+                  variant="outline"
+                  disabled={userFilters.page === totalPages}
+                  onClick={() => setUserFilters(prev => ({ ...prev, page: totalPages }))}
+                >
+                  Última
+                </Button>
+              </div>
+            </div>
+            <div className="mt-2 text-center text-sm text-gray-600">
+              Página {userFilters.page} de {totalPages}
+            </div>
+          </CardContent>
+        </Card>
+      )}
       <PermissionGate permission="users.create">
         {renderCreateUserDialog()}
       </PermissionGate>
