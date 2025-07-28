@@ -51,7 +51,7 @@ function Router() {
         <>
           <Route path="/dashboard" component={Dashboard} />
           <Route path="/credit-application">
-            <PermissionGate permission="credit_applications.create" fallback={<NotFound />}>
+            <PermissionGate permission="applications.create" fallback={<NotFound />}>
               <CreditApplication />
             </PermissionGate>
           </Route>

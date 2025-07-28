@@ -700,20 +700,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.get("/api/user/permissions", authenticateToken, async (req: any, res) => {
     try {
       const userId = req.user.id;
-      console.log("Getting permissions for user ID:", userId);
-      
       // Get user's profile
       const userData = await storage.getUserById(userId);
-      console.log("User data:", JSON.stringify(userData, null, 2));
       
       if (!userData || !userData.profileId) {
-        console.log("No user data or profile ID found");
         return res.json([]);
       }
       
       // Get permissions for the user's profile
       const userPermissions = await storage.getProfilePermissions(userData.profileId);
-      console.log("User permissions:", JSON.stringify(userPermissions, null, 2));
       
       res.json(userPermissions);
     } catch (error) {
