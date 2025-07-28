@@ -4,6 +4,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { formatKwanza, getProjectTypeLabel, getStatusLabel } from "@/lib/angola-utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { Link } from "wouter";
+import { PermissionGate } from "@/components/PermissionGate";
 import type { CreditApplication } from "@shared/schema";
 
 interface ApplicationsListProps {
@@ -38,9 +40,13 @@ export default function ApplicationsList({ applications, isLoading }: Applicatio
         <CardContent>
           <div className="text-center py-8">
             <p className="text-gray-600 mb-4">Ainda não tem solicitações de crédito.</p>
-            <Button className="bg-agri-primary hover:bg-agri-dark">
-              Fazer primeira solicitação
-            </Button>
+            <PermissionGate permission="applications.create">
+              <Link href="/credit-application">
+                <Button className="bg-agri-primary hover:bg-agri-dark">
+                  Fazer primeira solicitação
+                </Button>
+              </Link>
+            </PermissionGate>
           </div>
         </CardContent>
       </Card>

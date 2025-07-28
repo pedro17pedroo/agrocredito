@@ -699,7 +699,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Get user permissions
   app.get("/api/user/permissions", authenticateToken, async (req: any, res) => {
     try {
-      const userId = req.user.userId;
+      const userId = req.user.id;
       
       // Get user's profile
       const userData = await storage.getUserById(userId);

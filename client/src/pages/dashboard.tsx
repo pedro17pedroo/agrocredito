@@ -73,7 +73,7 @@ export default function Dashboard() {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-3 gap-6 mb-8">
-          <PermissionGate permission="credit_applications.create">
+          <PermissionGate permission="applications.create">
             <Link href="/credit-application">
               <Button className="w-full bg-agri-primary text-white p-6 rounded-xl hover:bg-agri-dark transition-colors text-left group h-auto">
                 <div className="flex flex-col items-start">
