@@ -97,13 +97,15 @@ export default function ApplicationsList({ applications, isLoading }: Applicatio
                       </span>
                     </td>
                     <td className="py-4 px-6">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="text-agri-primary hover:text-agri-dark font-medium"
-                      >
-                        Ver Detalhes
-                      </Button>
+                      <Link href={`/application/${application.id}`}>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="text-agri-primary hover:text-agri-dark font-medium"
+                        >
+                          Ver Detalhes
+                        </Button>
+                      </Link>
                     </td>
                   </tr>
                 );

@@ -9,6 +9,7 @@ import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
 import CreditApplication from "@/pages/credit-application";
+import ApplicationDetails from "@/pages/application-details";
 import Simulator from "@/pages/simulator";
 import Reports from "@/pages/reports";
 import ProfileManagement from "@/pages/profile-management";
@@ -53,6 +54,11 @@ function Router() {
           <Route path="/credit-application">
             <PermissionGate permission="applications.create" fallback={<NotFound />}>
               <CreditApplication />
+            </PermissionGate>
+          </Route>
+          <Route path="/application/:id">
+            <PermissionGate permission="applications.read" fallback={<NotFound />}>
+              <ApplicationDetails />
             </PermissionGate>
           </Route>
           <Route path="/reports">
