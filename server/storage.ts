@@ -156,8 +156,30 @@ export class DatabaseStorage implements IStorage {
 
   async getAllCreditApplications(): Promise<CreditApplication[]> {
     return await db
-      .select()
+      .select({
+        id: creditApplications.id,
+        userId: creditApplications.userId,
+        projectName: creditApplications.projectName,
+        projectType: creditApplications.projectType,
+        description: creditApplications.description,
+        amount: creditApplications.amount,
+        term: creditApplications.term,
+        interestRate: creditApplications.interestRate,
+        status: creditApplications.status,
+        rejectionReason: creditApplications.rejectionReason,
+        reviewedBy: creditApplications.reviewedBy,
+        approvedBy: creditApplications.approvedBy,
+        createdAt: creditApplications.createdAt,
+        updatedAt: creditApplications.updatedAt,
+        user: {
+          id: users.id,
+          fullName: users.fullName,
+          phone: users.phone,
+          email: users.email,
+        }
+      })
       .from(creditApplications)
+      .leftJoin(users, eq(creditApplications.userId, users.id))
       .orderBy(desc(creditApplications.createdAt));
   }
 
@@ -193,8 +215,30 @@ export class DatabaseStorage implements IStorage {
     historical: CreditApplication[];
   }> {
     const allApplications = await db
-      .select()
+      .select({
+        id: creditApplications.id,
+        userId: creditApplications.userId,
+        projectName: creditApplications.projectName,
+        projectType: creditApplications.projectType,
+        description: creditApplications.description,
+        amount: creditApplications.amount,
+        term: creditApplications.term,
+        interestRate: creditApplications.interestRate,
+        status: creditApplications.status,
+        rejectionReason: creditApplications.rejectionReason,
+        reviewedBy: creditApplications.reviewedBy,
+        approvedBy: creditApplications.approvedBy,
+        createdAt: creditApplications.createdAt,
+        updatedAt: creditApplications.updatedAt,
+        user: {
+          id: users.id,
+          fullName: users.fullName,
+          phone: users.phone,
+          email: users.email,
+        }
+      })
       .from(creditApplications)
+      .leftJoin(users, eq(creditApplications.userId, users.id))
       .orderBy(desc(creditApplications.createdAt));
 
     return {

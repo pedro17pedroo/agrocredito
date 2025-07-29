@@ -149,6 +149,7 @@ export default function FinancialInstitutionDashboard() {
   });
 
   const handleViewApplication = (application: CreditApplication) => {
+    console.log('Viewing application:', application);
     setSelectedApplication(application);
     setShowApplicationDetails(true);
   };
@@ -553,7 +554,7 @@ export default function FinancialInstitutionDashboard() {
 
         {/* Application Details Dialog */}
         <Dialog open={showApplicationDetails} onOpenChange={setShowApplicationDetails}>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Detalhes da Solicitação</DialogTitle>
               <DialogDescription>
@@ -590,10 +591,36 @@ export default function FinancialInstitutionDashboard() {
 
                 <div>
                   <h4 className="font-medium mb-2">Descrição do Projeto</h4>
-                  <p className="text-sm text-gray-600">{selectedApplication.description}</p>
+                  <p className="text-sm text-gray-600 bg-gray-50 p-3 rounded-md">{selectedApplication.description}</p>
                 </div>
 
                 <Separator />
+
+                {/* Cliente Information */}
+                {selectedApplication.user && (
+                  <>
+                    <div>
+                      <h4 className="font-medium mb-2">Dados do Cliente</h4>
+                      <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div>
+                          <p className="font-medium">Nome:</p>
+                          <p className="text-gray-600">{selectedApplication.user.fullName}</p>
+                        </div>
+                        <div>
+                          <p className="font-medium">Telefone:</p>
+                          <p className="text-gray-600">{selectedApplication.user.phone}</p>
+                        </div>
+                        {selectedApplication.user.email && (
+                          <div className="col-span-2">
+                            <p className="font-medium">Email:</p>
+                            <p className="text-gray-600">{selectedApplication.user.email}</p>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                    <Separator />
+                  </>
+                )}
 
                 <div>
                   <h4 className="font-medium mb-2">Estado Atual</h4>
