@@ -136,6 +136,7 @@ export function useRegister() {
 export function useLogout() {
   const queryClient = useQueryClient();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
 
   return useMutation({
     mutationFn: async () => {
@@ -151,6 +152,9 @@ export function useLogout() {
         title: "Logout realizado",
         description: "Até breve!",
       });
+      
+      // Redirect to home page
+      setLocation("/");
     },
   });
 }

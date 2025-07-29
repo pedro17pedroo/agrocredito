@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { useAuth } from "@/hooks/use-auth";
+import { useAuth, useLogout } from "@/hooks/use-auth";
 import { useToast } from "@/hooks/use-toast";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +21,9 @@ import {
   Banknote,
   TrendingUp,
   Users,
-  CreditCard
+  CreditCard,
+  LogOut,
+  Sprout
 } from "lucide-react";
 import { apiRequest } from "@/lib/queryClient";
 
@@ -99,6 +101,7 @@ export default function FinancialInstitutionDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const logout = useLogout();
   
   const [selectedApplication, setSelectedApplication] = useState<CreditApplication | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
@@ -181,6 +184,10 @@ export default function FinancialInstitutionDashboard() {
     });
   };
 
+  const handleLogout = () => {
+    logout.mutate();
+  };
+
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -199,10 +206,34 @@ export default function FinancialInstitutionDashboard() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      {/* Navigation Header */}
+      <nav className="bg-agri-primary text-white shadow-lg">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center">
+              <Sprout className="w-8 h-8 mr-3" />
+              <span className="text-xl font-bold">Painel Instituição Financeira</span>
+            </div>
+            <div className="flex items-center space-x-4">
+              <span className="hidden sm:block">{user?.fullName}</span>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={handleLogout}
+                className="bg-agri-dark hover:bg-opacity-80"
+              >
+                <LogOut className="w-4 h-4 mr-2" />
+                Sair
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
       <div className="max-w-7xl mx-auto p-6">
         {/* Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Painel da Instituição Financeira</h1>
+          <h1 className="text-3xl font-bold text-gray-900">Bem-vindo, {user?.fullName.split(' ')[0]}!</h1>
           <p className="text-gray-600 mt-2">Gerir solicitações e créditos aprovados</p>
         </div>
 
