@@ -45,8 +45,9 @@ export function formatKwanza(amount: number | string): string {
 }
 
 export function parseKwanza(formatted: string): number {
-  const cleaned = formatted.replace(/[^\d,]/g, '').replace(',', '.');
-  return parseFloat(cleaned) || 0;
+  // Remove everything except digits
+  const cleaned = formatted.replace(/[^\d]/g, '');
+  return parseInt(cleaned) || 0;
 }
 
 export function validateBI(bi: string): boolean {

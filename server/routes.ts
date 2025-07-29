@@ -315,6 +315,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/simulate-credit", async (req, res) => {
     try {
       const { amount, term, projectType } = req.body;
+      console.log("Simulation request:", { amount, term, projectType });
 
       if (!amount || !term) {
         return res.status(400).json({ message: "Montante e prazo são obrigatórios" });
@@ -340,16 +341,27 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const numPayments = parseInt(term);
       const principal = parseFloat(amount);
       
-      const monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
-                           (Math.pow(1 + monthlyRate, numPayments) - 1);
+      console.log("Calculation inputs:", { principal, monthlyRate, numPayments, interestRate });
+      
+      // Handle edge case where monthlyRate is 0 (would cause NaN)
+      let monthlyPayment;
+      if (monthlyRate === 0) {
+        monthlyPayment = principal / numPayments;
+      } else {
+        monthlyPayment = principal * (monthlyRate * Math.pow(1 + monthlyRate, numPayments)) / 
+                         (Math.pow(1 + monthlyRate, numPayments) - 1);
+      }
       
       const totalAmount = monthlyPayment * numPayments;
+      const totalInterest = totalAmount - principal;
+
+      console.log("Calculation results:", { monthlyPayment, totalAmount, totalInterest });
 
       res.json({
         monthlyPayment: Math.round(monthlyPayment),
         totalAmount: Math.round(totalAmount),
         interestRate,
-        totalInterest: Math.round(totalAmount - principal),
+        totalInterest: Math.round(totalInterest),
       });
     } catch (error) {
       console.error("Simulation error:", error);
