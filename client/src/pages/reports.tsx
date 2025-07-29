@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
-import { Download, FileText, BarChart3, PieChart, TrendingUp, Calendar } from "lucide-react";
+import { useLocation } from "wouter";
+import { Download, FileText, BarChart3, PieChart, TrendingUp, Calendar, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,6 +20,7 @@ import type { CreditApplication, Account, Payment } from "@shared/schema";
 export default function Reports() {
   const { user } = useAuth();
   const { toast } = useToast();
+  const [, setLocation] = useLocation();
   const [reportType, setReportType] = useState("overview");
   const [dateRange, setDateRange] = useState({
     from: startOfMonth(subMonths(new Date(), 6)),
@@ -185,12 +187,12 @@ export default function Reports() {
           applicationData.push([
             app.projectName,
             getProjectTypeLabel(app.projectType),
-            parseFloat(app.amount),
+            parseFloat(app.amount).toString(),
             app.status === 'approved' ? 'Aprovada' : 
             app.status === 'rejected' ? 'Rejeitada' : 
             app.status === 'pending' ? 'Pendente' : 'Em Análise',
             format(parseISO(app.createdAt!.toString()), 'dd/MM/yyyy', { locale: ptBR }),
-            app.term
+            app.term.toString()
           ]);
         });
 
@@ -205,7 +207,7 @@ export default function Reports() {
           const percentage = ((count / stats.totalApplications) * 100).toFixed(1);
           distributionData.push([
             getProjectTypeLabel(type),
-            count,
+            count.toString(),
             `${percentage}%`
           ]);
         });
@@ -249,9 +251,19 @@ export default function Reports() {
       <div className="bg-agri-primary text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold">Relatórios Financeiros</h1>
-              <p className="text-agri-secondary">Análise detalhada dos seus créditos agrícolas</p>
+            <div className="flex items-center space-x-4">
+              <Button
+                onClick={() => setLocation('/dashboard')}
+                variant="ghost"
+                className="text-white hover:bg-agri-dark"
+              >
+                <ArrowLeft className="w-4 h-4 mr-2" />
+                Voltar ao Dashboard
+              </Button>
+              <div>
+                <h1 className="text-2xl font-bold">Relatórios Financeiros</h1>
+                <p className="text-agri-secondary">Análise detalhada dos seus créditos agrícolas</p>
+              </div>
             </div>
             <div className="flex space-x-2">
               <Button
