@@ -67,10 +67,17 @@ export default function AdminDashboard() {
   });
 
   // Query hooks - all must be called before any early returns
-  const { data: allApplications = [], isLoading } = useQuery<CreditApplication[]>({
+  const { data: applicationsData, isLoading } = useQuery({
     queryKey: ["/api/admin/credit-applications"],
     enabled: !!user && (user.userType === "admin" || user.userType === "financial_institution"),
   });
+
+  // Handle different response formats based on user type
+  const allApplications = Array.isArray(applicationsData) 
+    ? applicationsData 
+    : applicationsData 
+      ? [...(applicationsData.new || []), ...(applicationsData.underReview || []), ...(applicationsData.historical || [])]
+      : [];
 
   const { data: stats } = useQuery({
     queryKey: ["/api/admin/stats"],
