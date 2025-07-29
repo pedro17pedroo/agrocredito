@@ -41,12 +41,18 @@ export interface IStorage {
   getCreditApplicationsByUserId(userId: string): Promise<CreditApplication[]>;
   getAllCreditApplications(): Promise<CreditApplication[]>;
   getCreditApplicationById(id: string): Promise<CreditApplication | undefined>;
-  updateCreditApplicationStatus(id: string, status: "pending" | "under_review" | "approved" | "rejected", rejectionReason?: string): Promise<void>;
+  updateCreditApplicationStatus(id: string, status: "pending" | "under_review" | "approved" | "rejected", rejectionReason?: string, reviewerId?: string): Promise<void>;
+  getCreditApplicationsForFinancialInstitution(financialInstitutionId: string): Promise<{
+    new: CreditApplication[];
+    underReview: CreditApplication[];
+    historical: CreditApplication[];
+  }>;
 
   // Account operations
   createAccount(account: InsertAccount): Promise<Account>;
   getAccountsByUserId(userId: string): Promise<Account[]>;
   getAllAccounts(): Promise<Account[]>;
+  getAccountsByFinancialInstitution(financialInstitutionId: string): Promise<Account[]>;
   getAccountById(id: string): Promise<Account | undefined>;
   updateAccountBalance(id: string, newBalance: number, nextPaymentDate?: Date): Promise<void>;
 
@@ -158,16 +164,58 @@ export class DatabaseStorage implements IStorage {
   async updateCreditApplicationStatus(
     id: string, 
     status: "pending" | "under_review" | "approved" | "rejected", 
-    rejectionReason?: string
+    rejectionReason?: string,
+    reviewerId?: string
   ): Promise<void> {
+    const updateData: any = { 
+      status, 
+      rejectionReason,
+      updatedAt: new Date(),
+    };
+
+    if (reviewerId && status === "under_review") {
+      updateData.reviewedBy = reviewerId;
+    }
+
+    if (reviewerId && status === "approved") {
+      updateData.approvedBy = reviewerId;
+    }
+
     await db
       .update(creditApplications)
-      .set({ 
-        status, 
-        rejectionReason,
-        updatedAt: new Date(),
-      })
+      .set(updateData)
       .where(eq(creditApplications.id, id));
+  }
+
+  async getCreditApplicationsForFinancialInstitution(financialInstitutionId: string): Promise<{
+    new: CreditApplication[];
+    underReview: CreditApplication[];
+    historical: CreditApplication[];
+  }> {
+    const allApplications = await db
+      .select()
+      .from(creditApplications)
+      .orderBy(desc(creditApplications.createdAt));
+
+    return {
+      // New applications: pending and not reviewed by anyone OR not reviewed by this institution
+      new: allApplications.filter(app => 
+        app.status === "pending" && 
+        (!app.approvedBy) // Not approved by any institution yet
+      ),
+      
+      // Under review: applications this institution is reviewing
+      underReview: allApplications.filter(app => 
+        app.status === "under_review" && 
+        app.reviewedBy === financialInstitutionId
+      ),
+      
+      // Historical: applications this institution approved or rejected
+      historical: allApplications.filter(app => 
+        (app.status === "approved" && app.approvedBy === financialInstitutionId) ||
+        (app.status === "rejected" && app.reviewedBy === financialInstitutionId)
+      )
+    };
   }
 
   // Account operations
@@ -197,7 +245,13 @@ export class DatabaseStorage implements IStorage {
       .orderBy(desc(accounts.createdAt));
   }
 
-
+  async getAccountsByFinancialInstitution(financialInstitutionId: string): Promise<Account[]> {
+    return await db
+      .select()
+      .from(accounts)
+      .where(and(eq(accounts.financialInstitutionId, financialInstitutionId), eq(accounts.isActive, true)))
+      .orderBy(desc(accounts.createdAt));
+  }
 
   async getAccountById(id: string): Promise<Account | undefined> {
     const [account] = await db.select().from(accounts).where(eq(accounts.id, id));

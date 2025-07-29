@@ -8,6 +8,7 @@ import { PermissionGate } from "@/components/PermissionGate";
 import Landing from "@/pages/landing";
 import Dashboard from "@/pages/dashboard";
 import AdminDashboard from "@/pages/admin-dashboard";
+import FinancialInstitutionDashboard from "@/pages/financial-institution-dashboard";
 import CreditApplication from "@/pages/credit-application";
 import ApplicationDetails from "@/pages/application-details";
 import Simulator from "@/pages/simulator";
@@ -43,6 +44,7 @@ function Router() {
       {/* Admin routes - accessible for both logged in and not logged in users */}
       <Route path="/admin" component={AdminDashboard} />
       <Route path="/admin-dashboard" component={AdminDashboard} />
+      <Route path="/financial-dashboard" component={FinancialInstitutionDashboard} />
       
       {/* Root route always shows landing page */}
       <Route path="/" component={Landing} />

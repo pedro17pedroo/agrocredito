@@ -2,17 +2,26 @@ import { useAuth, useLogout } from "@/hooks/use-auth";
 import { useQuery } from "@tanstack/react-query";
 import { Sprout, Plus, Calculator, Download, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { PermissionGate } from "@/components/PermissionGate";
 import StatsCards from "@/components/dashboard/stats-cards";
 import ApplicationsList from "@/components/dashboard/applications-list";
 import NotificationCenter from "@/components/notifications/notification-center";
 import { formatKwanza } from "@/lib/angola-utils";
 import type { CreditApplication, Account } from "@shared/schema";
+import { useEffect } from "react";
 
 export default function Dashboard() {
   const { user } = useAuth();
   const logout = useLogout();
+  const [, setLocation] = useLocation();
+
+  // Redirect financial institutions to their specialized dashboard
+  useEffect(() => {
+    if (user && user.userType === "financial_institution") {
+      setLocation("/financial-dashboard");
+    }
+  }, [user, setLocation]);
 
   const { data: applications = [], isLoading: applicationsLoading } = useQuery<CreditApplication[]>({
     queryKey: ["/api/credit-applications"],

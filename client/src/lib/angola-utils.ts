@@ -94,3 +94,14 @@ export function getStatusLabel(status: string): { label: string; className: stri
   
   return statusMap[status] || { label: status, className: 'bg-gray-100 text-gray-800' };
 }
+
+export function formatDate(dateString: string): string {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('pt-PT', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  });
+}

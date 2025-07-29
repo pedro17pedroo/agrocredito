@@ -65,6 +65,8 @@ export const creditApplications = pgTable("credit_applications", {
   interestRate: decimal("interest_rate", { precision: 5, scale: 2 }), // percentage
   status: applicationStatusEnum("status").default("pending"),
   rejectionReason: text("rejection_reason"),
+  reviewedBy: varchar("reviewed_by").references(() => users.id), // Financial institution that reviewed this application
+  approvedBy: varchar("approved_by").references(() => users.id), // Financial institution that approved this application
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });
@@ -74,6 +76,7 @@ export const accounts = pgTable("accounts", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   applicationId: varchar("application_id").notNull().references(() => creditApplications.id),
   userId: varchar("user_id").notNull().references(() => users.id),
+  financialInstitutionId: varchar("financial_institution_id").notNull().references(() => users.id), // Which institution approved and manages this account
   totalAmount: decimal("total_amount", { precision: 15, scale: 2 }).notNull(),
   outstandingBalance: decimal("outstanding_balance", { precision: 15, scale: 2 }).notNull(),
   monthlyPayment: decimal("monthly_payment", { precision: 15, scale: 2 }).notNull(),

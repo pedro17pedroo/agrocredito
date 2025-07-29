@@ -201,8 +201,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Acesso negado" });
       }
 
-      const applications = await storage.getAllCreditApplications();
-      res.json(applications);
+      if (req.user.userType === "admin") {
+        // Admin can see all applications
+        const applications = await storage.getAllCreditApplications();
+        res.json(applications);
+      } else {
+        // Financial institutions see applications specific to them
+        const applications = await storage.getCreditApplicationsForFinancialInstitution(req.user.id);
+        res.json(applications);
+      }
     } catch (error) {
       console.error("Get all applications error:", error);
       res.status(500).json({ message: "Erro interno do servidor" });
@@ -223,7 +230,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(400).json({ message: "Estado inválido" });
       }
 
-      await storage.updateCreditApplicationStatus(id, status, rejectionReason);
+      await storage.updateCreditApplicationStatus(id, status, rejectionReason, req.user.id);
       
       // Se aprovado, criar conta automaticamente
       if (status === "approved") {
@@ -253,6 +260,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           await storage.createAccount({
             applicationId: application.id,
             userId: application.userId,
+            financialInstitutionId: req.user.id, // The financial institution that approved this application
             totalAmount: totalAmount.toString(),
             outstandingBalance: totalAmount.toString(),
             monthlyPayment: monthlyPayment.toString(),
@@ -700,8 +708,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
         return res.status(403).json({ message: "Acesso negado" });
       }
       
-      const accounts = await storage.getAllAccounts();
-      res.json(accounts);
+      if (req.user.userType === "admin") {
+        // Admin can see all accounts
+        const accounts = await storage.getAllAccounts();
+        res.json(accounts);
+      } else {
+        // Financial institutions see only accounts they manage
+        const accounts = await storage.getAccountsByFinancialInstitution(req.user.id);
+        res.json(accounts);
+      }
     } catch (error) {
       console.error("Get accounts error:", error);
       res.status(500).json({ message: "Erro interno do servidor" });

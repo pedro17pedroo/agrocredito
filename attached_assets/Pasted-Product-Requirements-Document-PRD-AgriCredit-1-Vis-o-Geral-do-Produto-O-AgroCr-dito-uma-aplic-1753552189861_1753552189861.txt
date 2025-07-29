@@ -21,11 +21,9 @@ Instituições Financeiras: Entidades que analisam, aprovam ou rejeitam solicita
 4. Requisitos Funcionais (RF)
 
 
-
 Código
 Requisito
 Descrição
-
 
 
 RF01
@@ -82,11 +80,9 @@ Permitir exportação de relatórios de crédito em formatos como PDF ou Excel.
 5. Requisitos Não Funcionais (RNF)
 
 
-
 Código
 Requisito
 Descrição
-
 
 
 RNF01
@@ -133,12 +129,10 @@ Realizar backups automáticos diários e permitir recuperação rápida em caso 
 6. Casos de Uso
 
 
-
 Código
 Caso de Uso
 Ator(es)
 Descrição
-
 
 
 UC01
@@ -195,7 +189,6 @@ Sistema
 Proteger dados com autenticação e criptografia.
 
 
-
 7. Arquitetura Técnica
 Tecnologias
 
@@ -232,7 +225,6 @@ Relatórios: Exporta relatórios em PDF ou Excel para acompanhamento (RF10, UC06
 
 
 10. Cronograma Proposto
-
 
 
 Fase
@@ -285,10 +277,8 @@ Volume de Transações: 1.000 solicitações de crédito processadas nos primeir
 12. Riscos e Mitigações
 
 
-
 Risco
 Mitigação
-
 
 
 Baixa literacia digital dos utilizadores
