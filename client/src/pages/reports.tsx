@@ -5,12 +5,15 @@ import { Download, FileText, BarChart3, PieChart, TrendingUp, Calendar } from "l
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import { formatKwanza, getProjectTypeLabel } from "@/lib/angola-utils";
 import { format, parseISO, subMonths, startOfMonth, endOfMonth } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import jsPDF from 'jspdf';
+import autoTable from 'jspdf-autotable';
+import * as XLSX from 'xlsx';
+import { saveAs } from 'file-saver';
 import type { CreditApplication, Account, Payment } from "@shared/schema";
 
 export default function Reports() {
@@ -76,14 +79,166 @@ export default function Reports() {
     ? (stats.approvedApplications / stats.totalApplications) * 100 
     : 0;
 
+  const exportToPDF = () => {
+    try {
+      const doc = new jsPDF();
+      
+      // Header
+      doc.setFontSize(20);
+      doc.text('Relatório Financeiro AgriCredit', 20, 30);
+      doc.setFontSize(12);
+      doc.text(`Gerado em: ${format(new Date(), "dd/MM/yyyy 'às' HH:mm", { locale: ptBR })}`, 20, 40);
+      doc.text(`Usuário: ${user?.fullName}`, 20, 50);
+      
+      // Resumo estatístico
+      doc.setFontSize(16);
+      doc.text('Resumo Estatístico', 20, 70);
+      
+      const summaryData = [
+        ['Total de Solicitações', stats.totalApplications.toString()],
+        ['Solicitações Aprovadas', stats.approvedApplications.toString()],
+        ['Solicitações Rejeitadas', stats.rejectedApplications.toString()],
+        ['Solicitações Pendentes', stats.pendingApplications.toString()],
+        ['Taxa de Aprovação', `${approvalRate.toFixed(1)}%`],
+        ['Valor Total Solicitado', formatKwanza(stats.totalCreditValue)],
+        ['Valor Total Aprovado', formatKwanza(stats.approvedCreditValue)],
+        ['Total de Pagamentos', formatKwanza(stats.totalPayments)]
+      ];
+
+      autoTable(doc, {
+        head: [['Métrica', 'Valor']],
+        body: summaryData,
+        startY: 80,
+        theme: 'grid',
+        headStyles: { fillColor: [76, 175, 80] },
+      });
+
+      // Solicitações detalhadas
+      if (filteredApplications.length > 0) {
+        doc.addPage();
+        doc.setFontSize(16);
+        doc.text('Solicitações de Crédito', 20, 30);
+
+        const applicationData = filteredApplications.map(app => [
+          app.projectName,
+          getProjectTypeLabel(app.projectType),
+          formatKwanza(app.amount),
+          app.status === 'approved' ? 'Aprovada' : 
+          app.status === 'rejected' ? 'Rejeitada' : 
+          app.status === 'pending' ? 'Pendente' : 'Em Análise',
+          format(parseISO(app.createdAt!.toString()), 'dd/MM/yyyy', { locale: ptBR })
+        ]);
+
+        autoTable(doc, {
+          head: [['Projeto', 'Tipo', 'Montante', 'Estado', 'Data']],
+          body: applicationData,
+          startY: 40,
+          theme: 'grid',
+          headStyles: { fillColor: [76, 175, 80] },
+        });
+      }
+
+      // Save PDF
+      doc.save(`relatorio-agricredit-${format(new Date(), 'yyyy-MM-dd')}.pdf`);
+      
+      toast({
+        title: "PDF exportado com sucesso!",
+        description: "O relatório foi baixado para o seu dispositivo.",
+      });
+    } catch (error) {
+      console.error('PDF export error:', error);
+      toast({
+        title: "Erro ao exportar PDF",
+        description: "Não foi possível gerar o relatório PDF.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const exportToExcel = () => {
+    try {
+      const workbook = XLSX.utils.book_new();
+
+      // Resumo estatístico
+      const summaryData = [
+        ['Métrica', 'Valor'],
+        ['Total de Solicitações', stats.totalApplications],
+        ['Solicitações Aprovadas', stats.approvedApplications],
+        ['Solicitações Rejeitadas', stats.rejectedApplications],
+        ['Solicitações Pendentes', stats.pendingApplications],
+        ['Taxa de Aprovação (%)', parseFloat(approvalRate.toFixed(1))],
+        ['Valor Total Solicitado (AOA)', stats.totalCreditValue],
+        ['Valor Total Aprovado (AOA)', stats.approvedCreditValue],
+        ['Total de Pagamentos (AOA)', stats.totalPayments]
+      ];
+
+      const summarySheet = XLSX.utils.aoa_to_sheet(summaryData);
+      XLSX.utils.book_append_sheet(workbook, summarySheet, 'Resumo');
+
+      // Solicitações detalhadas
+      if (filteredApplications.length > 0) {
+        const applicationData = [
+          ['Projeto', 'Tipo', 'Montante (AOA)', 'Estado', 'Data', 'Prazo (meses)']
+        ];
+        
+        filteredApplications.forEach(app => {
+          applicationData.push([
+            app.projectName,
+            getProjectTypeLabel(app.projectType),
+            parseFloat(app.amount),
+            app.status === 'approved' ? 'Aprovada' : 
+            app.status === 'rejected' ? 'Rejeitada' : 
+            app.status === 'pending' ? 'Pendente' : 'Em Análise',
+            format(parseISO(app.createdAt!.toString()), 'dd/MM/yyyy', { locale: ptBR }),
+            app.term
+          ]);
+        });
+
+        const applicationsSheet = XLSX.utils.aoa_to_sheet(applicationData);
+        XLSX.utils.book_append_sheet(workbook, applicationsSheet, 'Solicitações');
+      }
+
+      // Distribuição por tipo de projeto
+      if (Object.keys(projectDistribution).length > 0) {
+        const distributionData = [['Tipo de Projeto', 'Quantidade', 'Percentual']];
+        Object.entries(projectDistribution).forEach(([type, count]) => {
+          const percentage = ((count / stats.totalApplications) * 100).toFixed(1);
+          distributionData.push([
+            getProjectTypeLabel(type),
+            count,
+            `${percentage}%`
+          ]);
+        });
+
+        const distributionSheet = XLSX.utils.aoa_to_sheet(distributionData);
+        XLSX.utils.book_append_sheet(workbook, distributionSheet, 'Distribuição');
+      }
+
+      // Generate and save Excel file
+      const excelBuffer = XLSX.write(workbook, { bookType: 'xlsx', type: 'array' });
+      const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+      saveAs(blob, `relatorio-agricredit-${format(new Date(), 'yyyy-MM-dd')}.xlsx`);
+      
+      toast({
+        title: "Excel exportado com sucesso!",
+        description: "O relatório foi baixado para o seu dispositivo.",
+      });
+    } catch (error) {
+      console.error('Excel export error:', error);
+      toast({
+        title: "Erro ao exportar Excel",
+        description: "Não foi possível gerar o relatório Excel.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const exportReport = (format: "pdf" | "excel") => {
-    toast({
-      title: `Relatório ${format.toUpperCase()} em preparação`,
-      description: "O seu relatório será gerado e enviado para download em breve.",
-    });
-    
-    // Aqui implementaríamos a funcionalidade de exportação
-    // Por agora, apenas mostramos a notificação
+    if (format === "pdf") {
+      exportToPDF();
+    } else {
+      exportToExcel();
+    }
   };
 
   if (!user) return null;
