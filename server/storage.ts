@@ -27,6 +27,16 @@ import {
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
 
+// This storage file is now deprecated in favor of the new Model architecture
+// The new models are located in the models/ directory:
+// - UserModel (models/User.ts)
+// - CreditApplicationModel (models/CreditApplication.ts)
+// - AccountModel (models/Account.ts)
+// - PaymentModel (models/Payment.ts)
+// - NotificationModel (models/Notification.ts)
+// - ProfileModel (models/Profile.ts)
+// - PermissionModel (models/Profile.ts)
+
 export interface IStorage {
   // User operations
   getUser(id: string): Promise<User | undefined>;
