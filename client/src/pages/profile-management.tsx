@@ -201,7 +201,7 @@ export default function ProfileManagement() {
     form.reset({
       name: profile.name,
       description: profile.description || "",
-      isActive: profile.isActive,
+      isActive: profile.isActive ?? true,
     });
   };
 

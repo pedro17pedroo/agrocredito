@@ -7,7 +7,7 @@ import LoginForm from "@/components/auth/login-form";
 import RegisterForm from "@/components/auth/register-form";
 import SimulatorForm from "@/components/credit/simulator-form";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 export default function Landing() {
   const [showLogin, setShowLogin] = useState(false);
@@ -448,6 +448,9 @@ export default function Landing() {
       {/* Modals */}
       <Dialog open={showLogin} onOpenChange={setShowLogin}>
         <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Iniciar Sessão</DialogTitle>
+          </DialogHeader>
           <LoginForm 
             onSuccess={() => setShowLogin(false)}
             onSwitchToRegister={() => {
@@ -460,6 +463,9 @@ export default function Landing() {
 
       <Dialog open={showRegister} onOpenChange={setShowRegister}>
         <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Criar Conta</DialogTitle>
+          </DialogHeader>
           <RegisterForm 
             onSuccess={() => setShowRegister(false)}
             onSwitchToLogin={() => {

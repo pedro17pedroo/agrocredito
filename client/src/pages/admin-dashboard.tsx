@@ -75,8 +75,8 @@ export default function AdminDashboard() {
   // Handle different response formats based on user type
   const allApplications = Array.isArray(applicationsData) 
     ? applicationsData 
-    : applicationsData 
-      ? [...(applicationsData.new || []), ...(applicationsData.underReview || []), ...(applicationsData.historical || [])]
+    : (applicationsData as any)
+      ? [...((applicationsData as any).new || []), ...((applicationsData as any).underReview || []), ...((applicationsData as any).historical || [])]
       : [];
 
   const { data: stats } = useQuery({
