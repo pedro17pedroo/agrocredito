@@ -24,11 +24,11 @@ export default function Dashboard() {
   }, [user, setLocation]);
 
   const { data: applications = [], isLoading: applicationsLoading } = useQuery<CreditApplication[]>({
-    queryKey: ["/api/credit-applications"],
+    queryKey: ["/api/applications/user"],
   });
 
   const { data: accounts = [], isLoading: accountsLoading } = useQuery<Account[]>({
-    queryKey: ["/api/accounts"],
+    queryKey: ["/api/accounts/user"],
   });
 
   const handleLogout = () => {

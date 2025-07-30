@@ -16,7 +16,7 @@ export default function ApplicationDetails() {
   const applicationId = params.id;
 
   const { data: application, isLoading } = useQuery<CreditApplication>({
-    queryKey: ['/api/credit-applications', applicationId],
+    queryKey: ['/api/applications', applicationId],
     enabled: !!applicationId,
   });
 
