@@ -50,7 +50,7 @@ export default function CreditApplication() {
       };
       
       const response = await apiRequest("POST", "/api/credit-applications", applicationData);
-      return response.json();
+      return await response.json();
     },
     onSuccess: () => {
       toast({

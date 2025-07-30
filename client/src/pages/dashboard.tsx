@@ -24,7 +24,7 @@ export default function Dashboard() {
   }, [user, setLocation]);
 
   const { data: applications = [], isLoading: applicationsLoading } = useQuery<CreditApplication[]>({
-    queryKey: ["/api/applications/user"],
+    queryKey: ["/api/credit-applications/user"],
   });
 
   const { data: accounts = [], isLoading: accountsLoading } = useQuery<Account[]>({

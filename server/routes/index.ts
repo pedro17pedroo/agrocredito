@@ -13,7 +13,7 @@ import adminRoutes from "./admin";
 export function registerRoutes(app: Express): Server {
   // Register all API routes
   app.use("/api/auth", authRoutes);
-  app.use("/api/applications", creditApplicationRoutes);
+  app.use("/api/credit-applications", creditApplicationRoutes);
   app.use("/api/accounts", accountRoutes);
   app.use("/api/notifications", notificationRoutes);
   app.use("/api/users", userRoutes);
