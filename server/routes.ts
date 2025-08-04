@@ -41,6 +41,10 @@ const authenticateToken = async (req: any, res: any, next: any) => {
 };
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  
+  // Import and register credit program routes
+  const creditProgramRoutes = await import("./routes/creditPrograms.js");
+  app.use("/api/credit-programs", creditProgramRoutes.default);
   // Auth routes
   app.post("/api/auth/register", async (req, res) => {
     try {

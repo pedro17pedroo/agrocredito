@@ -53,10 +53,30 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow(),
 });
 
+// Credit programs table - managed by financial institutions
+export const creditPrograms = pgTable("credit_programs", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  financialInstitutionId: varchar("financial_institution_id").notNull().references(() => users.id), // Which institution owns this program
+  name: varchar("name", { length: 255 }).notNull(),
+  description: text("description"),
+  projectTypes: varchar("project_types").array().notNull(), // Array of project types this program supports
+  minAmount: decimal("min_amount", { precision: 15, scale: 2 }).notNull(), // Minimum loan amount in AOA
+  maxAmount: decimal("max_amount", { precision: 15, scale: 2 }).notNull(), // Maximum loan amount in AOA
+  minTerm: integer("min_term").notNull(), // Minimum term in months
+  maxTerm: integer("max_term").notNull(), // Maximum term in months
+  interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull(), // Annual interest rate percentage
+  effortRate: decimal("effort_rate", { precision: 5, scale: 2 }).notNull(), // Maximum effort rate (payment/income ratio) percentage
+  processingFee: decimal("processing_fee", { precision: 5, scale: 2 }).default("0"), // Processing fee percentage
+  isActive: boolean("is_active").default(true),
+  createdAt: timestamp("created_at").defaultNow(),
+  updatedAt: timestamp("updated_at").defaultNow(),
+});
+
 // Credit applications table
 export const creditApplications = pgTable("credit_applications", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull().references(() => users.id),
+  creditProgramId: varchar("credit_program_id").references(() => creditPrograms.id), // Link to the credit program used
   projectName: varchar("project_name", { length: 255 }).notNull(),
   projectType: projectTypeEnum("project_type").notNull(),
   description: text("description").notNull(),
@@ -141,6 +161,12 @@ export const insertNotificationSchema = createInsertSchema(notifications).omit({
   updatedAt: true,
 });
 
+export const insertCreditProgramSchema = createInsertSchema(creditPrograms).omit({
+  id: true,
+  createdAt: true,
+  updatedAt: true,
+});
+
 export const insertProfileSchema = createInsertSchema(profiles).omit({
   id: true,
   createdAt: true,
@@ -181,3 +207,6 @@ export type InsertPermission = z.infer<typeof insertPermissionSchema>;
 
 export type ProfilePermission = typeof profilePermissions.$inferSelect;
 export type InsertProfilePermission = z.infer<typeof insertProfilePermissionSchema>;
+
+export type CreditProgram = typeof creditPrograms.$inferSelect;
+export type InsertCreditProgram = z.infer<typeof insertCreditProgramSchema>;

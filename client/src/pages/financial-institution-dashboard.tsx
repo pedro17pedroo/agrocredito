@@ -23,8 +23,10 @@ import {
   Users,
   CreditCard,
   LogOut,
-  Sprout
+  Sprout,
+  Settings
 } from "lucide-react";
+import CreditProgramManagement from "@/components/credit/credit-program-management";
 import { apiRequest } from "@/lib/queryClient";
 
 interface CreditApplication {
@@ -287,7 +289,7 @@ export default function FinancialInstitutionDashboard() {
 
         {/* Main Content Tabs */}
         <Tabs defaultValue="new" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="new">
               Novas Solicitações ({newApplications.length})
             </TabsTrigger>
@@ -299,6 +301,10 @@ export default function FinancialInstitutionDashboard() {
             </TabsTrigger>
             <TabsTrigger value="historical">
               Histórico ({historicalApplications.length})
+            </TabsTrigger>
+            <TabsTrigger value="programs">
+              <Settings className="w-4 h-4 mr-2" />
+              Programas de Crédito
             </TabsTrigger>
           </TabsList>
 
@@ -549,6 +555,11 @@ export default function FinancialInstitutionDashboard() {
                 )}
               </CardContent>
             </Card>
+          </TabsContent>
+
+          {/* Credit Programs Tab */}
+          <TabsContent value="programs" className="space-y-4">
+            <CreditProgramManagement />
           </TabsContent>
         </Tabs>
 
