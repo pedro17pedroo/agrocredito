@@ -7,6 +7,7 @@ import {
   profiles,
   permissions,
   profilePermissions,
+  creditPrograms,
   type User, 
   type InsertUser,
   type CreditApplication,
@@ -22,7 +23,9 @@ import {
   type Permission,
   type InsertPermission,
   type ProfilePermission,
-  type InsertProfilePermission
+  type InsertProfilePermission,
+  type CreditProgram,
+  type InsertCreditProgram
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, desc, and } from "drizzle-orm";
@@ -96,6 +99,14 @@ export interface IStorage {
 
   // User profile operations
   assignProfileToUser(userId: string, profileId: string): Promise<void>;
+
+  // Credit program operations
+  createCreditProgram(program: InsertCreditProgram): Promise<CreditProgram>;
+  getCreditProgramsByFinancialInstitution(financialInstitutionId: string): Promise<CreditProgram[]>;
+  getCreditProgramById(id: string): Promise<CreditProgram | undefined>;
+  updateCreditProgram(id: string, program: Partial<InsertCreditProgram>): Promise<void>;
+  deleteCreditProgram(id: string): Promise<void>;
+  toggleCreditProgramStatus(id: string): Promise<void>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -499,6 +510,61 @@ export class DatabaseStorage implements IStorage {
       .update(users)
       .set({ profileId, updatedAt: new Date() })
       .where(eq(users.id, userId));
+  }
+
+  // Credit program operations
+  async createCreditProgram(program: InsertCreditProgram): Promise<CreditProgram> {
+    const [creditProgram] = await db
+      .insert(creditPrograms)
+      .values({
+        ...program,
+        updatedAt: new Date(),
+      })
+      .returning();
+    return creditProgram;
+  }
+
+  async getCreditProgramsByFinancialInstitution(financialInstitutionId: string): Promise<CreditProgram[]> {
+    return await db
+      .select()
+      .from(creditPrograms)
+      .where(eq(creditPrograms.financialInstitutionId, financialInstitutionId))
+      .orderBy(desc(creditPrograms.createdAt));
+  }
+
+  async getCreditProgramById(id: string): Promise<CreditProgram | undefined> {
+    const [program] = await db
+      .select()
+      .from(creditPrograms)
+      .where(eq(creditPrograms.id, id));
+    return program;
+  }
+
+  async updateCreditProgram(id: string, program: Partial<InsertCreditProgram>): Promise<void> {
+    await db
+      .update(creditPrograms)
+      .set({
+        ...program,
+        updatedAt: new Date(),
+      })
+      .where(eq(creditPrograms.id, id));
+  }
+
+  async deleteCreditProgram(id: string): Promise<void> {
+    await db.delete(creditPrograms).where(eq(creditPrograms.id, id));
+  }
+
+  async toggleCreditProgramStatus(id: string): Promise<void> {
+    const program = await this.getCreditProgramById(id);
+    if (program) {
+      await db
+        .update(creditPrograms)
+        .set({
+          isActive: !program.isActive,
+          updatedAt: new Date(),
+        })
+        .where(eq(creditPrograms.id, id));
+    }
   }
 }
 

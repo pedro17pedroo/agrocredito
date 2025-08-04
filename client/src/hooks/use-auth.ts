@@ -78,8 +78,10 @@ export function useLogin() {
       });
 
       // Redirect based on user type
-      if (data.user.userType === "admin" || data.user.userType === "financial_institution") {
+      if (data.user.userType === "admin") {
         setLocation("/admin-dashboard");
+      } else if (data.user.userType === "financial_institution") {
+        setLocation("/financial-dashboard");
       } else {
         setLocation("/dashboard");
       }
@@ -117,8 +119,10 @@ export function useRegister() {
       });
 
       // Redirect based on user type
-      if (data.user.userType === "admin" || data.user.userType === "financial_institution") {
+      if (data.user.userType === "admin") {
         setLocation("/admin-dashboard");
+      } else if (data.user.userType === "financial_institution") {
+        setLocation("/financial-dashboard");
       } else {
         setLocation("/dashboard");
       }
