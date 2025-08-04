@@ -1,6 +1,6 @@
 import { db } from "./db";
 import { eq } from "drizzle-orm";
-import { creditApplications, accounts, notifications, type InsertAccount, type InsertNotification } from "@shared/schema";
+import { creditApplications, accounts, notifications, users, type InsertAccount, type InsertNotification } from "@shared/schema";
 
 export async function createTestAccount() {
   try {
@@ -45,10 +45,23 @@ export async function createTestAccount() {
     const nextPaymentDate = new Date();
     nextPaymentDate.setDate(nextPaymentDate.getDate() + 30);
 
+    // Buscar a instituição financeira
+    const [financialInstitution] = await db
+      .select()
+      .from(users)
+      .where(eq(users.phone, "+244934567890"))
+      .limit(1);
+
+    if (!financialInstitution) {
+      console.log("❌ Instituição financeira não encontrada.");
+      return;
+    }
+
     // Criar a conta
     const accountData: InsertAccount = {
       applicationId: approvedApplication.id,
       userId: approvedApplication.userId,
+      financialInstitutionId: financialInstitution.id,
       totalAmount: totalAmount.toString(),
       outstandingBalance: totalAmount.toString(),
       monthlyPayment: monthlyPayment.toString(),
