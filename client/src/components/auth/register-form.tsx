@@ -9,17 +9,16 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
 import { useRegister } from "@/hooks/use-auth";
-import { formatAngolaPhone, validateAngolaPhone, validateBI, validateNIF } from "@/lib/angola-utils";
+import { formatAngolaPhone, validateAngolaPhone, validateBI } from "@/lib/angola-utils";
 
 const registerSchema = z.object({
   fullName: z.string().min(3, "Nome deve ter pelo menos 3 caracteres"),
   bi: z.string().refine(validateBI, "BI inválido. Formato: 000000000LA000"),
-  nif: z.string().optional().refine((val) => !val || validateNIF(val), "NIF inválido"),
   phone: z.string().refine(validateAngolaPhone, "Número de telefone angolano inválido"),
   email: z.string().email("Email inválido").optional().or(z.literal("")),
   password: z.string().min(6, "Palavra-passe deve ter pelo menos 6 caracteres"),
   confirmPassword: z.string(),
-  userType: z.enum(["farmer", "company", "cooperative", "financial_institution", "admin"]),
+  userType: z.enum(["farmer", "company", "financial_institution"]),
   acceptTerms: z.boolean().refine((val) => val === true, "Deve aceitar os termos"),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Palavras-passe não coincidem",
@@ -43,7 +42,6 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
     defaultValues: {
       fullName: "",
       bi: "",
-      nif: "",
       phone: "",
       email: "",
       password: "",
@@ -94,11 +92,9 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    <SelectItem value="farmer">Agricultor Individual</SelectItem>
+                    <SelectItem value="farmer">Agricultor Familiar</SelectItem>
                     <SelectItem value="company">Empresa Agrícola</SelectItem>
-                    <SelectItem value="cooperative">Cooperativa Agrícola</SelectItem>
                     <SelectItem value="financial_institution">Instituição Financeira</SelectItem>
-                    <SelectItem value="admin">Administrador</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
@@ -144,45 +140,25 @@ export default function RegisterForm({ onSuccess, onSwitchToLogin }: RegisterFor
             />
           </div>
           
-          <div className="grid md:grid-cols-2 gap-6">
-            <FormField
-              control={form.control}
-              name="nif"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="form-label">NIF (opcional)</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field} 
-                      placeholder="5000000000"
-                      className="form-input"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            
-            <FormField
-              control={form.control}
-              name="phone"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="form-label">Telemóvel</FormLabel>
-                  <FormControl>
-                    <Input 
-                      {...field} 
-                      placeholder="+244 923 456 789"
-                      className="form-input"
-                      onChange={(e) => handlePhoneChange(e.target.value)}
-                    />
-                  </FormControl>
-                  <p className="text-sm text-gray-500">Formato: +244 9XX XXX XXX</p>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-          </div>
+          <FormField
+            control={form.control}
+            name="phone"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel className="form-label">Telemóvel</FormLabel>
+                <FormControl>
+                  <Input 
+                    {...field} 
+                    placeholder="+244 923 456 789"
+                    className="form-input"
+                    onChange={(e) => handlePhoneChange(e.target.value)}
+                  />
+                </FormControl>
+                <p className="text-sm text-gray-500">Formato: +244 9XX XXX XXX</p>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
           
           <FormField
             control={form.control}
