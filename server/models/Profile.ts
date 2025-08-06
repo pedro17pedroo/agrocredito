@@ -18,6 +18,11 @@ export class ProfileModel {
     return profile;
   }
 
+  static async findByName(name: string): Promise<Profile | undefined> {
+    const [profile] = await db.select().from(profiles).where(eq(profiles.name, name));
+    return profile;
+  }
+
   static async findAll(): Promise<Profile[]> {
     return await db
       .select()

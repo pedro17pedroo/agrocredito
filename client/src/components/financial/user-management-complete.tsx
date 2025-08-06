@@ -200,6 +200,9 @@ export default function UserManagementComplete() {
   };
 
   const onSubmit = (data: InternalUserForm) => {
+    // Find the "Instituição Financeira" profile
+    const financialInstitutionProfile = profiles.find(p => p.name === "Instituição Financeira");
+    
     if (selectedUser) {
       // Don't send password if it's empty (meaning no change)
       const updateData = { ...data };
@@ -208,7 +211,12 @@ export default function UserManagementComplete() {
       }
       updateUser.mutate({ id: selectedUser.id, data: updateData });
     } else {
-      createUser.mutate(data);
+      // For new users, automatically assign financial institution profile
+      const newUserData = {
+        ...data,
+        profileId: financialInstitutionProfile?.id || data.profileId
+      };
+      createUser.mutate(newUserData);
     }
   };
 
@@ -541,22 +549,22 @@ export default function UserManagementComplete() {
               )}
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="password">
-                  {selectedUser ? "Nova Palavra-passe (Opcional)" : "Palavra-passe"}
-                </Label>
-                <Input
-                  id="password"
-                  type="password"
-                  {...form.register("password")}
-                  placeholder={selectedUser ? "Deixe vazio para manter atual" : "Palavra-passe"}
-                />
-                {form.formState.errors.password && (
-                  <p className="text-sm text-red-500">{form.formState.errors.password.message}</p>
-                )}
-              </div>
-              
+            <div className="space-y-2">
+              <Label htmlFor="password">
+                {selectedUser ? "Nova Palavra-passe (Opcional)" : "Palavra-passe"}
+              </Label>
+              <Input
+                id="password"
+                type="password"
+                {...form.register("password")}
+                placeholder={selectedUser ? "Deixe vazio para manter atual" : "Palavra-passe"}
+              />
+              {form.formState.errors.password && (
+                <p className="text-sm text-red-500">{form.formState.errors.password.message}</p>
+              )}
+            </div>
+
+            {selectedUser && (
               <div className="space-y-2">
                 <Label htmlFor="profileId">Perfil</Label>
                 <Select 
@@ -579,7 +587,22 @@ export default function UserManagementComplete() {
                   </SelectContent>
                 </Select>
               </div>
-            </div>
+            )}
+
+            {!selectedUser && (
+              <div className="space-y-2">
+                <Label>Perfil</Label>
+                <div className="p-3 bg-green-50 rounded-md border border-green-200">
+                  <div className="flex items-center gap-2">
+                    <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span className="text-sm font-medium text-green-800">Instituição Financeira</span>
+                  </div>
+                  <p className="text-xs text-green-600 mt-1">
+                    ✓ Perfil atribuído automaticamente para membros da equipa interna
+                  </p>
+                </div>
+              </div>
+            )}
 
             <DialogFooter>
               <Button

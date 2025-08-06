@@ -88,10 +88,20 @@ export class FinancialUserController {
       // Hash password
       const hashedPassword = await bcrypt.hash(userData.password, 10);
       
+      // If no profile specified, assign "Instituição Financeira" profile automatically
+      let profileId = userData.profileId;
+      if (!profileId || profileId === "" || profileId === "none") {
+        const financialInstitutionProfile = await ProfileModel.findByName("Instituição Financeira");
+        if (financialInstitutionProfile) {
+          profileId = financialInstitutionProfile.id;
+        }
+      }
+      
       // Create internal user linked to this financial institution
       const newUser = await UserModel.create({
         ...userData,
         password: hashedPassword,
+        profileId,
         parentInstitutionId: user.id, // Link to parent financial institution
       });
 
