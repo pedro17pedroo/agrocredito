@@ -164,7 +164,7 @@ export default function DocumentUpload({ userType, documents, onDocumentChange }
               
               <div
                 className={`
-                  border-2 border-dashed rounded-lg p-4 transition-colors
+                  border-2 border-dashed rounded-lg p-4 transition-colors relative overflow-hidden
                   ${draggedOver === requirement.id ? 'border-agri-primary bg-agri-light/10' : 'border-gray-300'}
                   ${hasFile ? 'bg-green-50 border-green-300' : 'hover:border-agri-primary hover:bg-agri-light/5'}
                 `}
@@ -211,12 +211,15 @@ export default function DocumentUpload({ userType, documents, onDocumentChange }
                   </div>
                 )}
                 
-                <Input
-                  type="file"
-                  accept=".jpg,.jpeg,.png,.pdf"
-                  onChange={(e) => handleFileChange(requirement.id, e)}
-                  className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                />
+                {!hasFile && (
+                  <Input
+                    id={`file-input-${requirement.id}`}
+                    type="file"
+                    accept=".jpg,.jpeg,.png,.pdf"
+                    onChange={(e) => handleFileChange(requirement.id, e)}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                  />
+                )}
               </div>
             </div>
           );
