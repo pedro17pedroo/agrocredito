@@ -136,9 +136,7 @@ export const insertUserSchema = createInsertSchema(users).omit({
   updatedAt: true,
 });
 
-// Export types
-export type User = typeof users.$inferSelect;
-export type InsertUser = typeof users.$inferInsert;
+
 
 export const insertCreditApplicationSchema = createInsertSchema(creditApplications).omit({
   id: true,
