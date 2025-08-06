@@ -43,6 +43,11 @@ export function registerRoutes(app: Express): Server {
 
   // Credit Programs Routes
   const creditProgramRouter = Router();
+  // Public routes first (no authentication required)
+  creditProgramRouter.get("/public", CreditProgramController.getAllPublicPrograms);
+  creditProgramRouter.get("/institution/:institutionId", CreditProgramController.getProgramsByInstitution);
+  
+  // Protected routes (authentication required)
   creditProgramRouter.use(authenticateToken);
   creditProgramRouter.get("/", CreditProgramController.getPrograms);
   creditProgramRouter.get("/:id", CreditProgramController.getProgram);

@@ -21,6 +21,24 @@ export class UserController {
     }
   }
 
+  // Get all financial institutions (public endpoint for farmers/companies)
+  static async getFinancialInstitutions(req: Request, res: Response) {
+    try {
+      const institutions = await UserModel.findFinancialInstitutions();
+      // Remove passwords and sensitive data from response
+      const sanitizedInstitutions = institutions.map(institution => ({
+        id: institution.id,
+        fullName: institution.fullName,
+        userType: institution.userType,
+        isActive: institution.isActive,
+      }));
+      res.json(sanitizedInstitutions);
+    } catch (error) {
+      console.error("Get financial institutions error:", error);
+      res.status(500).json({ message: "Erro interno do servidor" });
+    }
+  }
+
   static async getById(req: Request, res: Response) {
     try {
       const { id } = req.params;

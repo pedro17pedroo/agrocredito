@@ -4,7 +4,10 @@ import { authenticateToken } from "../middleware/auth";
 
 const router = Router();
 
-// All user routes require authentication
+// Public route for financial institutions (no auth required)
+router.get("/financial-institutions", UserController.getFinancialInstitutions);
+
+// All other user routes require authentication
 router.use(authenticateToken);
 
 // User routes

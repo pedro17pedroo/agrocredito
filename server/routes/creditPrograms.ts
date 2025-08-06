@@ -29,7 +29,14 @@ const authenticateToken = async (req: any, res: any, next: any) => {
   }
 };
 
-// All routes require authentication
+// Public routes (no authentication required)
+// Get all public credit programs
+router.get("/public", CreditProgramController.getAllPublicPrograms);
+
+// Get credit programs by financial institution
+router.get("/institution/:institutionId", CreditProgramController.getProgramsByInstitution);
+
+// All other routes require authentication
 router.use(authenticateToken);
 
 // Get all credit programs for the authenticated financial institution

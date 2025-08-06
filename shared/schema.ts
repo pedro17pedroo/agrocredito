@@ -88,6 +88,11 @@ export const creditApplications = pgTable("credit_applications", {
   rejectionReason: text("rejection_reason"),
   reviewedBy: varchar("reviewed_by").references(() => users.id), // Financial institution that reviewed this application
   approvedBy: varchar("approved_by").references(() => users.id), // Financial institution that approved this application
+  
+  // Document fields - different requirements for farmers vs companies
+  documents: text("documents").array().default(sql`ARRAY[]::text[]`), // Array of document URLs/paths
+  documentTypes: text("document_types").array().default(sql`ARRAY[]::text[]`), // Array describing what each document is
+  
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
 });

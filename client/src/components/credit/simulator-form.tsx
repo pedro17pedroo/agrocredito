@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { useMutation } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { formatKwanza, parseKwanza } from "@/lib/angola-utils";
+import FinancialInstitutionSelector from "./financial-institution-selector";
 
 const simulatorSchema = z.object({
   amount: z.string().min(1, "Montante é obrigatório"),
@@ -27,8 +28,26 @@ interface SimulationResult {
   totalInterest: number;
 }
 
+interface CreditProgram {
+  id: string;
+  name: string;
+  description: string;
+  projectTypes: string[];
+  minAmount: string;
+  maxAmount: string;
+  minTerm: number;
+  maxTerm: number;
+  interestRate: string;
+  effortRate: string;
+  processingFee: string;
+  financialInstitutionId: string;
+}
+
 export default function SimulatorForm() {
   const [result, setResult] = useState<SimulationResult | null>(null);
+  const [selectedInstitution, setSelectedInstitution] = useState<string>("");
+  const [selectedProgram, setSelectedProgram] = useState<string>("");
+  const [selectedProgramData, setSelectedProgramData] = useState<CreditProgram | undefined>();
 
   const form = useForm<SimulatorForm>({
     resolver: zodResolver(simulatorSchema),
@@ -41,11 +60,14 @@ export default function SimulatorForm() {
 
   const simulate = useMutation({
     mutationFn: async (data: SimulatorForm) => {
-      const response = await apiRequest("POST", "/api/simulate-credit", {
+      const simulationData = {
         amount: parseKwanza(data.amount),
-        term: data.term,
+        term: parseInt(data.term),
         projectType: data.projectType,
-      });
+        creditProgramId: selectedProgram || undefined,
+      };
+      
+      const response = await apiRequest("POST", "/api/simulate-credit", simulationData);
       return response.json() as Promise<SimulationResult>;
     },
     onSuccess: (data) => {
@@ -67,11 +89,55 @@ export default function SimulatorForm() {
     }
   };
 
+  const handleInstitutionChange = (institutionId: string) => {
+    setSelectedInstitution(institutionId);
+    setSelectedProgram("");
+    setSelectedProgramData(undefined);
+    setResult(null);
+  };
+
+  const handleProgramChange = (programId: string, program?: CreditProgram) => {
+    setSelectedProgram(programId);
+    setSelectedProgramData(program);
+    setResult(null);
+    
+    // Update form values based on selected program
+    if (program) {
+      const amount = parseKwanza(form.getValues('amount'));
+      const minAmount = parseInt(program.minAmount);
+      const maxAmount = parseInt(program.maxAmount);
+      
+      // Ensure amount is within program limits
+      if (amount < minAmount) {
+        form.setValue('amount', formatKwanza(minAmount));
+      } else if (amount > maxAmount) {
+        form.setValue('amount', formatKwanza(maxAmount));
+      }
+      
+      // Ensure term is within program limits
+      const term = parseInt(form.getValues('term'));
+      if (term < program.minTerm) {
+        form.setValue('term', program.minTerm.toString());
+      } else if (term > program.maxTerm) {
+        form.setValue('term', program.maxTerm.toString());
+      }
+    }
+  };
+
   return (
-    <Card className="shadow-xl">
-      <CardContent className="p-8">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+    <div className="space-y-6">
+      <FinancialInstitutionSelector
+        selectedInstitution={selectedInstitution}
+        onInstitutionChange={handleInstitutionChange}
+        selectedProgram={selectedProgram}
+        onProgramChange={handleProgramChange}
+        projectType={form.watch('projectType')}
+      />
+      
+      <Card className="shadow-xl">
+        <CardContent className="p-8">
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="grid md:grid-cols-2 gap-6">
               <FormField
                 control={form.control}
@@ -185,7 +251,8 @@ export default function SimulatorForm() {
             </div>
           </div>
         )}
-      </CardContent>
-    </Card>
+        </CardContent>
+      </Card>
+    </div>
   );
 }

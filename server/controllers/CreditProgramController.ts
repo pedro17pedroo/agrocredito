@@ -26,6 +26,71 @@ export class CreditProgramController {
     }
   }
 
+  // Get all public credit programs (for farmers/companies to view)
+  static async getAllPublicPrograms(req: Request, res: Response) {
+    try {
+      const programs = await db
+        .select({
+          id: creditPrograms.id,
+          name: creditPrograms.name,
+          description: creditPrograms.description,
+          projectTypes: creditPrograms.projectTypes,
+          minAmount: creditPrograms.minAmount,
+          maxAmount: creditPrograms.maxAmount,
+          minTerm: creditPrograms.minTerm,
+          maxTerm: creditPrograms.maxTerm,
+          interestRate: creditPrograms.interestRate,
+          effortRate: creditPrograms.effortRate,
+          processingFee: creditPrograms.processingFee,
+          financialInstitutionId: creditPrograms.financialInstitutionId,
+        })
+        .from(creditPrograms)
+        .where(eq(creditPrograms.isActive, true))
+        .orderBy(creditPrograms.createdAt);
+
+      res.json(programs);
+    } catch (error) {
+      console.error("Error fetching public credit programs:", error);
+      res.status(500).json({ error: "Erro ao carregar programas de crédito" });
+    }
+  }
+
+  // Get credit programs by financial institution (for farmers/companies)
+  static async getProgramsByInstitution(req: Request, res: Response) {
+    try {
+      const { institutionId } = req.params;
+
+      const programs = await db
+        .select({
+          id: creditPrograms.id,
+          name: creditPrograms.name,
+          description: creditPrograms.description,
+          projectTypes: creditPrograms.projectTypes,
+          minAmount: creditPrograms.minAmount,
+          maxAmount: creditPrograms.maxAmount,
+          minTerm: creditPrograms.minTerm,
+          maxTerm: creditPrograms.maxTerm,
+          interestRate: creditPrograms.interestRate,
+          effortRate: creditPrograms.effortRate,
+          processingFee: creditPrograms.processingFee,
+          financialInstitutionId: creditPrograms.financialInstitutionId,
+        })
+        .from(creditPrograms)
+        .where(
+          and(
+            eq(creditPrograms.financialInstitutionId, institutionId),
+            eq(creditPrograms.isActive, true)
+          )
+        )
+        .orderBy(creditPrograms.createdAt);
+
+      res.json(programs);
+    } catch (error) {
+      console.error("Error fetching programs by institution:", error);
+      res.status(500).json({ error: "Erro ao carregar programas de crédito" });
+    }
+  }
+
   // Get single credit program
   static async getProgram(req: Request, res: Response) {
     try {

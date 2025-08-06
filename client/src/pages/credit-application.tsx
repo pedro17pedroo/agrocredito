@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useLocation } from "wouter";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { ArrowLeft, Sprout } from "lucide-react";
+import { ArrowLeft, Sprout, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
@@ -14,6 +14,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
 import { formatKwanza, parseKwanza } from "@/lib/angola-utils";
+import { useAuth } from "@/hooks/use-auth";
+import FinancialInstitutionSelector from "@/components/credit/financial-institution-selector";
+import DocumentUpload from "@/components/credit/document-upload";
 
 const applicationSchema = z.object({
   projectName: z.string().min(3, "Nome do projeto deve ter pelo menos 3 caracteres"),
@@ -25,10 +28,34 @@ const applicationSchema = z.object({
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
 
+interface CreditProgram {
+  id: string;
+  name: string;
+  description: string;
+  projectTypes: string[];
+  minAmount: string;
+  maxAmount: string;
+  minTerm: number;
+  maxTerm: number;
+  interestRate: string;
+  effortRate: string;
+  processingFee: string;
+  financialInstitutionId: string;
+}
+
 export default function CreditApplication() {
   const [, setLocation] = useLocation();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  const { user } = useAuth();
+  
+  // Financial institution and program selection
+  const [selectedInstitution, setSelectedInstitution] = useState<string>("");
+  const [selectedProgram, setSelectedProgram] = useState<string>("");
+  const [selectedProgramData, setSelectedProgramData] = useState<CreditProgram | undefined>();
+  
+  // Document uploads
+  const [documents, setDocuments] = useState<{ [key: string]: File | null }>({});
 
   const form = useForm<ApplicationForm>({
     resolver: zodResolver(applicationSchema),
@@ -43,13 +70,49 @@ export default function CreditApplication() {
 
   const createApplication = useMutation({
     mutationFn: async (data: ApplicationForm) => {
-      const applicationData = {
-        ...data,
-        amount: parseKwanza(data.amount).toString(),
-        term: parseInt(data.term),
-      };
+      // Validate required documents
+      if (user && ['farmer', 'company', 'cooperative'].includes(user.userType)) {
+        const userType = user.userType as 'farmer' | 'company' | 'cooperative';
+        const requiredDocs = getRequiredDocuments(userType);
+        const missingDocs = requiredDocs.filter(doc => !documents[doc.id]);
+        
+        if (missingDocs.length > 0) {
+          throw new Error(`Documentos obrigatórios em falta: ${missingDocs.map(d => d.name).join(', ')}`);
+        }
+      }
+
+      // Create FormData for file upload
+      const formData = new FormData();
+      formData.append('projectName', data.projectName);
+      formData.append('projectType', data.projectType);
+      formData.append('description', data.description);
+      formData.append('amount', parseKwanza(data.amount).toString());
+      formData.append('term', data.term);
       
-      const response = await apiRequest("POST", "/api/credit-applications", applicationData);
+      if (selectedProgram) {
+        formData.append('creditProgramId', selectedProgram);
+      }
+
+      // Add documents
+      Object.entries(documents).forEach(([key, file]) => {
+        if (file) {
+          formData.append(`documents[${key}]`, file);
+        }
+      });
+      
+      const response = await fetch("/api/credit-applications", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Erro ao enviar solicitação");
+      }
+      
       return await response.json();
     },
     onSuccess: () => {
@@ -83,6 +146,79 @@ export default function CreditApplication() {
     }
   };
 
+  const handleInstitutionChange = (institutionId: string) => {
+    setSelectedInstitution(institutionId);
+    setSelectedProgram("");
+    setSelectedProgramData(undefined);
+  };
+
+  const handleProgramChange = (programId: string, program?: CreditProgram) => {
+    setSelectedProgram(programId);
+    setSelectedProgramData(program);
+    
+    // Update form values based on selected program
+    if (program) {
+      const amount = parseKwanza(form.getValues('amount'));
+      const minAmount = parseInt(program.minAmount);
+      const maxAmount = parseInt(program.maxAmount);
+      
+      // Ensure amount is within program limits
+      if (amount < minAmount) {
+        form.setValue('amount', formatKwanza(minAmount));
+      } else if (amount > maxAmount) {
+        form.setValue('amount', formatKwanza(maxAmount));
+      }
+      
+      // Ensure term is within program limits
+      const term = parseInt(form.getValues('term'));
+      if (term < program.minTerm) {
+        form.setValue('term', program.minTerm.toString());
+      } else if (term > program.maxTerm) {
+        form.setValue('term', program.maxTerm.toString());
+      }
+    }
+  };
+
+  const handleDocumentChange = (documentId: string, file: File | null) => {
+    setDocuments(prev => ({
+      ...prev,
+      [documentId]: file
+    }));
+  };
+
+  const getRequiredDocuments = (userType: 'farmer' | 'company' | 'cooperative') => {
+    const requirements = {
+      farmer: [
+        { id: "bi", name: "Bilhete de Identidade (BI)", required: true },
+        { id: "soba_declaration", name: "Declaração do Soba", required: true },
+        { id: "municipal_declaration", name: "Declaração da Administração Municipal", required: true },
+        { id: "agricultural_proof", name: "Comprovativo da Actividade Agrícola", required: true },
+        { id: "residence_certificate", name: "Atestado de Residência", required: false },
+      ],
+      company: [
+        { id: "bi", name: "Bilhete de Identidade (BI)", required: true },
+        { id: "company_document", name: "Documento da Empresa", required: true },
+        { id: "agricultural_proof", name: "Comprovativo da Actividade Agrícola", required: true },
+        { id: "business_plan", name: "Plano de Negócio", required: true },
+        { id: "residence_proof", name: "Comprovativo de Residência", required: true },
+        { id: "nif", name: "NIF", required: true },
+        { id: "commercial_license", name: "Alvará Comercial", required: true },
+        { id: "bank_statement", name: "Extrato Bancário", required: true },
+      ],
+      cooperative: [
+        { id: "bi", name: "Bilhete de Identidade (BI)", required: true },
+        { id: "company_document", name: "Documento da Cooperativa", required: true },
+        { id: "agricultural_proof", name: "Comprovativo da Actividade Agrícola", required: true },
+        { id: "business_plan", name: "Plano de Negócio", required: true },
+        { id: "residence_proof", name: "Comprovativo de Residência", required: true },
+        { id: "nif", name: "NIF", required: true },
+        { id: "commercial_license", name: "Alvará Comercial", required: true },
+        { id: "bank_statement", name: "Extrato Bancário", required: true },
+      ],
+    };
+    return requirements[userType] || [];
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -101,16 +237,27 @@ export default function CreditApplication() {
           </div>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center text-agri-dark">
-              <Sprout className="w-6 h-6 mr-2" />
-              Detalhes do Projeto Agrícola
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <div className="space-y-6">
+          {/* Financial Institution and Program Selection */}
+          <FinancialInstitutionSelector
+            selectedInstitution={selectedInstitution}
+            onInstitutionChange={handleInstitutionChange}
+            selectedProgram={selectedProgram}
+            onProgramChange={handleProgramChange}
+            projectType={form.watch('projectType')}
+          />
+
+          {/* Project Details */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center text-agri-dark">
+                <Sprout className="w-6 h-6 mr-2" />
+                Detalhes do Projeto Agrícola
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
                 <div className="grid md:grid-cols-2 gap-6">
                   <FormField
                     control={form.control}
@@ -238,10 +385,20 @@ export default function CreditApplication() {
                     {createApplication.isPending ? "Enviando..." : "Enviar Solicitação"}
                   </Button>
                 </div>
-              </form>
-            </Form>
-          </CardContent>
-        </Card>
+                </form>
+              </Form>
+            </CardContent>
+          </Card>
+
+          {/* Document Upload Section */}
+          {user && ['farmer', 'company', 'cooperative'].includes(user.userType) && (
+            <DocumentUpload
+              userType={user.userType as 'farmer' | 'company' | 'cooperative'}
+              documents={documents}
+              onDocumentChange={handleDocumentChange}
+            />
+          )}
+        </div>
       </div>
     </div>
   );
