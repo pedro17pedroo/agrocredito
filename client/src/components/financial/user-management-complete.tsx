@@ -76,7 +76,7 @@ export default function UserManagementComplete() {
       email: "",
       password: "",
       userType: "financial_institution",
-      profileId: "",
+      profileId: "none",
     },
   });
 
@@ -194,7 +194,7 @@ export default function UserManagementComplete() {
       email: user.email || "",
       password: "", // Don't prefill password
       userType: "financial_institution",
-      profileId: user.profileId || "",
+      profileId: user.profileId || "none",
     });
     setShowEditDialog(true);
   };
@@ -330,16 +330,17 @@ export default function UserManagementComplete() {
                           <div className="flex items-center gap-2">
                             <Badge variant="outline">{getProfileName(user.profileId)}</Badge>
                             <Select
-                              value={user.profileId || ""}
-                              onValueChange={(profileId) => 
-                                assignProfile.mutate({ userId: user.id, profileId })
-                              }
+                              value={user.profileId || "none"}
+                              onValueChange={(profileId) => {
+                                const actualProfileId = profileId === "none" ? "" : profileId;
+                                assignProfile.mutate({ userId: user.id, profileId: actualProfileId });
+                              }}
                             >
                               <SelectTrigger className="w-8 h-8 p-0">
                                 <Settings className="w-4 h-4" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="">Sem perfil</SelectItem>
+                                <SelectItem value="none">Sem perfil</SelectItem>
                                 {profiles.map((profile) => (
                                   <SelectItem key={profile.id} value={profile.id}>
                                     {profile.name}
@@ -559,14 +560,17 @@ export default function UserManagementComplete() {
               <div className="space-y-2">
                 <Label htmlFor="profileId">Perfil</Label>
                 <Select 
-                  value={form.watch("profileId") || ""} 
-                  onValueChange={(value) => form.setValue("profileId", value)}
+                  value={form.watch("profileId") || "none"} 
+                  onValueChange={(value) => {
+                    const actualValue = value === "none" ? "" : value;
+                    form.setValue("profileId", actualValue);
+                  }}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecionar perfil" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Sem perfil</SelectItem>
+                    <SelectItem value="none">Sem perfil</SelectItem>
                     {profiles.map((profile) => (
                       <SelectItem key={profile.id} value={profile.id}>
                         {profile.name}
