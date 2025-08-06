@@ -31,6 +31,10 @@ Preferred communication style: Simple, everyday language.
   - ✅ **Correção de Bug**: Resolvido problema de varchar length nas notificações
   - ✅ **Aplicações de Crédito**: Sistema funcionando completamente sem erros
   - ✅ **PRD Detalhado**: Documento completo gerado com análise técnica de 112 ficheiros implementados
+  - ✅ **Gestão de Utilizadores Multi-tenant**: Sistema completo implementado para gestão de utilizadores internos e visualização de clientes
+  - ✅ **API Multi-tenant**: Endpoints `/api/financial-users/*` criados com segurança por instituição
+  - ✅ **Schema atualizado**: Campo `parentInstitutionId` adicionado para suporte multi-tenant
+  - ✅ **Interface completa**: Componente de gestão com tabs para equipa interna e clientes, formulários de criação/edição
 
 - **July 27, 2025**: **PROJETO COMPLETO E FUNCIONANDO EM PRODUÇÃO** 🎉
   - ✅ **100% do PRD implementado**: Todos os 10 requisitos funcionais e 8 não-funcionais atendidos

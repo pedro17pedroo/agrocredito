@@ -38,7 +38,7 @@ export const profilePermissions = pgTable("profile_permissions", {
 });
 
 // Users table
-export const users = pgTable("users", {
+export const users: any = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   fullName: varchar("full_name", { length: 255 }).notNull(),
   bi: varchar("bi", { length: 50 }).notNull().unique(), // Bilhete de Identidade
@@ -48,6 +48,7 @@ export const users = pgTable("users", {
   password: text("password").notNull(),
   userType: userTypeEnum("user_type").notNull(),
   profileId: varchar("profile_id").references(() => profiles.id), // Link to profile for permissions
+  parentInstitutionId: varchar("parent_institution_id"), // For internal users of financial institutions
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -134,6 +135,10 @@ export const insertUserSchema = createInsertSchema(users).omit({
   createdAt: true,
   updatedAt: true,
 });
+
+// Export types
+export type User = typeof users.$inferSelect;
+export type InsertUser = typeof users.$inferInsert;
 
 export const insertCreditApplicationSchema = createInsertSchema(creditApplications).omit({
   id: true,

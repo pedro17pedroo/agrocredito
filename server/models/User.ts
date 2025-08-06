@@ -1,6 +1,9 @@
-import { eq, desc } from "drizzle-orm";
+import { eq, desc, inArray } from "drizzle-orm";
 import { db } from "../db";
-import { users, type User, type InsertUser } from "@shared/schema";
+import { users } from "@shared/schema";
+
+type User = typeof users.$inferSelect;
+type InsertUser = typeof users.$inferInsert;
 
 export class UserModel {
   static async findById(id: string): Promise<User | undefined> {
@@ -43,10 +46,36 @@ export class UserModel {
     return user;
   }
 
-  static async assignProfile(userId: string, profileId: string): Promise<void> {
-    await db
+  static async assignProfile(userId: string, profileId: string): Promise<User | undefined> {
+    const [user] = await db
       .update(users)
       .set({ profileId, updatedAt: new Date() })
-      .where(eq(users.id, userId));
+      .where(eq(users.id, userId))
+      .returning();
+    return user;
+  }
+
+  static async findByParentInstitution(institutionId: string): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.parentInstitutionId, institutionId))
+      .orderBy(desc(users.createdAt));
+  }
+
+  static async findClients(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(inArray(users.userType, ['farmer', 'company', 'cooperative']))
+      .orderBy(desc(users.createdAt));
+  }
+
+  static async findFinancialInstitutions(): Promise<User[]> {
+    return await db
+      .select()
+      .from(users)
+      .where(eq(users.userType, 'financial_institution'))
+      .orderBy(desc(users.createdAt));
   }
 }
