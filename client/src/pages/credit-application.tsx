@@ -83,46 +83,38 @@ export default function CreditApplication() {
 
   const createApplication = useMutation({
     mutationFn: async (data: ApplicationForm) => {
-      // Validate required documents
-      if (user && ['farmer', 'company', 'cooperative'].includes(user.userType)) {
-        const userType = user.userType as 'farmer' | 'company' | 'cooperative';
-        const requiredDocs = getRequiredDocuments(userType);
-        const missingDocs = requiredDocs.filter(doc => !documents[doc.id]);
-        
-        if (missingDocs.length > 0) {
-          throw new Error(`Documentos obrigatórios em falta: ${missingDocs.map(d => d.name).join(', ')}`);
-        }
-      }
+      // TODO: Validate required documents (disabled temporarily until file upload is implemented)
+      // if (user && ['farmer', 'company', 'cooperative'].includes(user.userType)) {
+      //   const userType = user.userType as 'farmer' | 'company' | 'cooperative';
+      //   const requiredDocs = getRequiredDocuments(userType).filter(doc => doc.required);
+      //   const missingDocs = requiredDocs.filter(doc => !documents[doc.id]);
+      //   
+      //   if (missingDocs.length > 0) {
+      //     throw new Error(`Documentos obrigatórios em falta: ${missingDocs.map(d => d.name).join(', ')}`);
+      //   }
+      // }
 
-      // Create FormData for file upload
-      const formData = new FormData();
-      formData.append('projectName', data.projectName);
-      formData.append('projectType', data.projectType);
-      formData.append('description', data.description);
-      formData.append('amount', parseKwanza(data.amount).toString());
-      formData.append('term', data.term);
-      formData.append('productivity', data.productivity);
-      formData.append('agricultureType', data.agricultureType);
-      formData.append('creditDeliveryMethod', data.creditDeliveryMethod);
-      formData.append('creditGuaranteeDeclaration', data.creditGuaranteeDeclaration);
-      
-      if (selectedProgram) {
-        formData.append('creditProgramId', selectedProgram);
-      }
-
-      // Add documents
-      Object.entries(documents).forEach(([key, file]) => {
-        if (file) {
-          formData.append(`documents[${key}]`, file);
-        }
-      });
+      // For now, send JSON data (file upload will be handled separately)
+      const payload = {
+        projectName: data.projectName,
+        projectType: data.projectType,
+        description: data.description,
+        amount: parseKwanza(data.amount).toString(),
+        term: data.term,
+        productivity: data.productivity,
+        agricultureType: data.agricultureType,
+        creditDeliveryMethod: data.creditDeliveryMethod,
+        creditGuaranteeDeclaration: data.creditGuaranteeDeclaration,
+        ...(selectedProgram && { creditProgramId: selectedProgram }),
+      };
       
       const response = await fetch("/api/credit-applications", {
         method: "POST",
         headers: {
+          "Content-Type": "application/json",
           Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },
-        body: formData,
+        body: JSON.stringify(payload),
       });
 
       if (!response.ok) {
@@ -448,7 +440,7 @@ export default function CreditApplication() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="form-label">Prazo (meses)</FormLabel>
-                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
                           <FormControl>
                             <SelectTrigger className="form-input">
                               <SelectValue placeholder="Selecione o prazo" />
