@@ -24,6 +24,15 @@ const applicationSchema = z.object({
   description: z.string().min(10, "Descrição deve ter pelo menos 10 caracteres"),
   amount: z.string().min(1, "Montante é obrigatório"),
   term: z.string().min(1, "Prazo é obrigatório"),
+  // New fields
+  productivity: z.enum(["small", "medium", "large"], { 
+    required_error: "Seleccione o nível de produtividade" 
+  }),
+  agricultureType: z.string().min(3, "Tipo de agricultura deve ter pelo menos 3 caracteres"),
+  creditDeliveryMethod: z.enum(["total", "monthly"], {
+    required_error: "Seleccione a forma de disponibilidade do crédito"
+  }),
+  creditGuaranteeDeclaration: z.string().min(20, "Declaração da garantia deve ter pelo menos 20 caracteres"),
 });
 
 type ApplicationForm = z.infer<typeof applicationSchema>;
@@ -65,6 +74,10 @@ export default function CreditApplication() {
       description: "",
       amount: "",
       term: "12",
+      productivity: "small",
+      agricultureType: "",
+      creditDeliveryMethod: "total",
+      creditGuaranteeDeclaration: "",
     },
   });
 
@@ -88,6 +101,10 @@ export default function CreditApplication() {
       formData.append('description', data.description);
       formData.append('amount', parseKwanza(data.amount).toString());
       formData.append('term', data.term);
+      formData.append('productivity', data.productivity);
+      formData.append('agricultureType', data.agricultureType);
+      formData.append('creditDeliveryMethod', data.creditDeliveryMethod);
+      formData.append('creditGuaranteeDeclaration', data.creditGuaranteeDeclaration);
       
       if (selectedProgram) {
         formData.append('creditProgramId', selectedProgram);
@@ -315,6 +332,89 @@ export default function CreditApplication() {
                           {...field} 
                           placeholder="Descreva detalhadamente o seu projeto agrícola, objetivos e como pretende usar o crédito..."
                           className="min-h-[120px] form-input"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="grid md:grid-cols-2 gap-6">
+                  <FormField
+                    control={form.control}
+                    name="productivity"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="form-label">Produtividade</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="form-input">
+                              <SelectValue placeholder="Selecione o nível" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="small">Pequeno Produtor</SelectItem>
+                            <SelectItem value="medium">Médio Produtor</SelectItem>
+                            <SelectItem value="large">Grande Produtor</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="agricultureType"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="form-label">Tipo de Agricultura</FormLabel>
+                        <FormControl>
+                          <Input 
+                            {...field} 
+                            placeholder="ex: Horticultura, Pecuária, Agricultura Familiar..."
+                            className="form-input"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="creditDeliveryMethod"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="form-label">Forma de Disponibilidade do Crédito</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger className="form-input">
+                            <SelectValue placeholder="Selecione a forma de entrega" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="total">Entrega Total</SelectItem>
+                          <SelectItem value="monthly">Por Prestação Mensal</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="creditGuaranteeDeclaration"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="form-label">Declaração da Garantia do Crédito</FormLabel>
+                      <FormControl>
+                        <Textarea 
+                          {...field} 
+                          placeholder="Declare qual a garantia que irá oferecer à instituição financeira para a concessão do crédito (ex: hipoteca de terreno, penhor de equipamentos, aval de terceiros, etc.)..."
+                          className="min-h-[100px] form-input"
                         />
                       </FormControl>
                       <FormMessage />

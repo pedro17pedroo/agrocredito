@@ -27,6 +27,10 @@ export async function seedApplications() {
         description: "Projeto para cultivo de 5 hectares de milho durante a época das chuvas. Incluí preparação do terreno, sementes melhoradas, fertilizantes e pesticidas. Expectativa de produção de 25 toneladas.",
         amount: "750000.00", // 750.000 AOA
         term: 12,
+        productivity: "medium",
+        agricultureType: "Agricultura de cereais - milho híbrido",
+        creditDeliveryMethod: "monthly",
+        creditGuaranteeDeclaration: "Ofereço como garantia a hipoteca da propriedade agrícola de 8 hectares localizada na comuna do Kaculama, avaliada em AOA 1,200,000. Adicionalmente, disponibilizo o aval do Sr. António Manuel, comerciante na região.",
         status: "pending"
       },
       {
@@ -36,6 +40,10 @@ export async function seedApplications() {
         description: "Aquisição de 10 cabeças de gado bovino para criação e reprodução. Inclui construção de curral, vacinação e alimentação para os primeiros 6 meses.",
         amount: "2500000.00", // 2.500.000 AOA
         term: 24,
+        productivity: "large",
+        agricultureType: "Pecuária bovina - criação e reprodução",
+        creditDeliveryMethod: "total",
+        creditGuaranteeDeclaration: "Ofereço como garantia a hipoteca do terreno de 20 hectares com pastagens, localizado no município de Malanje, avaliado em AOA 4,000,000. Tenho também contrato de fornecimento com o frigorífico local como garantia adicional.",
         status: "under_review"
       },
       {
@@ -45,6 +53,10 @@ export async function seedApplications() {
         description: "Cultivo de 3 hectares de mandioca. Projeto inclui preparação do solo, mudas, ferramentas agrícolas e mão-de-obra para plantio e colheita.",
         amount: "450000.00", // 450.000 AOA
         term: 18,
+        productivity: "small",
+        agricultureType: "Agricultura de tubérculos - mandioca",
+        creditDeliveryMethod: "monthly",
+        creditGuaranteeDeclaration: "Apresento como garantia o penhor de equipamentos agrícolas (trator e alfaias) avaliados em AOA 650,000, além do aval solidário da Cooperativa Agrícola de Malanje.",
         status: "approved"
       },
       {
@@ -54,6 +66,10 @@ export async function seedApplications() {
         description: "Montagem de aviário para 200 galinhas poedeiras. Inclui construção do galinheiro, aquisição das aves, ração para os primeiros 3 meses e equipamentos.",
         amount: "850000.00", // 850.000 AOA
         term: 15,
+        productivity: "medium",
+        agricultureType: "Avicultura - produção de ovos",
+        creditDeliveryMethod: "total",
+        creditGuaranteeDeclaration: "Ofereço como garantia a hipoteca da propriedade onde será construído o aviário, avaliada em AOA 1,100,000, e contrato de fornecimento de ovos com mercados locais.",
         status: "rejected"
       },
       {
@@ -63,6 +79,10 @@ export async function seedApplications() {
         description: "Desenvolvimento de horta para produção de tomate, cebola, alface e pimento. Inclui sistema de irrigação, sementes, fertilizantes orgânicos e ferramentas.",
         amount: "320000.00", // 320.000 AOA
         term: 9,
+        productivity: "small",
+        agricultureType: "Horticultura - produtos frescos",
+        creditDeliveryMethod: "total",
+        creditGuaranteeDeclaration: "Apresento como garantia equipamentos de irrigação e ferramentas agrícolas avaliados em AOA 400,000, além do aval do presidente da associação de agricultores locais.",
         status: "pending"
       }
     ];

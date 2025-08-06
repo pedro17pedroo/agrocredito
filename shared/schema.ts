@@ -85,6 +85,13 @@ export const creditApplications = pgTable("credit_applications", {
   description: text("description").notNull(),
   amount: decimal("amount", { precision: 15, scale: 2 }).notNull(), // AOA amount
   term: integer("term").notNull(), // months
+  
+  // New required fields for agricultural project details
+  productivity: varchar("productivity", { length: 50 }).notNull(), // Pequeno/Medio/Grande Produtor
+  agricultureType: varchar("agriculture_type", { length: 255 }).notNull(), // Horticultura, Pecuária, etc
+  creditDeliveryMethod: varchar("credit_delivery_method", { length: 50 }).notNull(), // Entrega Total/Por Prestação Mensal
+  creditGuaranteeDeclaration: text("credit_guarantee_declaration").notNull(), // Declaração da garantia
+  
   interestRate: decimal("interest_rate", { precision: 5, scale: 2 }), // percentage
   status: applicationStatusEnum("status").default("pending"),
   rejectionReason: text("rejection_reason"),
