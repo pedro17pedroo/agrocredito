@@ -43,7 +43,14 @@ export class AccountController {
 
   static async getByFinancialInstitution(req: any, res: Response) {
     try {
-      const financialInstitutionId = req.user.id;
+      const user = req.user;
+      let financialInstitutionId = user.id;
+      
+      // If user is an internal user of financial institution, use parent institution ID
+      if (user.parentInstitutionId) {
+        financialInstitutionId = user.parentInstitutionId;
+      }
+      
       const accounts = await AccountModel.findByFinancialInstitution(financialInstitutionId);
       res.json(accounts);
     } catch (error) {

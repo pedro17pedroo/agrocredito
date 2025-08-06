@@ -130,7 +130,14 @@ export class CreditApplicationController {
 
   static async getForFinancialInstitution(req: any, res: Response) {
     try {
-      const financialInstitutionId = req.user.id;
+      const user = req.user;
+      let financialInstitutionId = user.id;
+      
+      // If user is an internal user of financial institution, use parent institution ID
+      if (user.parentInstitutionId) {
+        financialInstitutionId = user.parentInstitutionId;
+      }
+      
       const applications = await CreditApplicationModel.findForFinancialInstitution(financialInstitutionId);
       res.json(applications);
     } catch (error) {

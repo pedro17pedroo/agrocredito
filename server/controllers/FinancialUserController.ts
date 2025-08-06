@@ -20,8 +20,14 @@ export class FinancialUserController {
         return res.status(403).json({ message: "Acesso negado" });
       }
 
+      // Determine the institution ID - could be user's own ID or parent institution
+      let institutionId = user.id;
+      if (user.parentInstitutionId) {
+        institutionId = user.parentInstitutionId;
+      }
+
       // Get all users that belong to this financial institution
-      const internalUsers = await UserModel.findByParentInstitution(user.id);
+      const internalUsers = await UserModel.findByParentInstitution(institutionId);
       
       // Remove passwords from response
       const sanitizedUsers = internalUsers.map(user => ({
