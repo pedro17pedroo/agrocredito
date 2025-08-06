@@ -26,13 +26,13 @@ export async function seedCreditPrograms() {
         name: "AgriCredi Milho Plus",
         description: "Programa especial para produtores de milho com condições diferenciadas. Taxa reduzida e prazo estendido para plantações de grande escala.",
         projectTypes: ["corn"],
-        minAmount: 200000,   // 200.000 AOA
-        maxAmount: 5000000,  // 5.000.000 AOA
+        minAmount: "200000.00",   // 200.000 AOA
+        maxAmount: "5000000.00",  // 5.000.000 AOA
         minTerm: 6,
         maxTerm: 24,
-        interestRate: 12.5,  // 12,5% ao ano
-        effortRate: 35.0,    // Taxa de esforço máxima 35%
-        processingFee: 2.5,  // Taxa de processamento 2,5%
+        interestRate: "12.50",  // 12,5% ao ano
+        effortRate: "35.00",    // Taxa de esforço máxima 35%
+        processingFee: "2.50",  // Taxa de processamento 2,5%
         isActive: true,
         requirements: [
           "Experiência mínima de 2 anos na cultura",
@@ -52,13 +52,13 @@ export async function seedCreditPrograms() {
         name: "Pecuária Sustentável",
         description: "Financiamento para projetos de pecuária bovina e caprina com foco na sustentabilidade e modernização das práticas de criação.",
         projectTypes: ["cattle"],
-        minAmount: 1000000,  // 1.000.000 AOA
-        maxAmount: 10000000, // 10.000.000 AOA
+        minAmount: "1000000.00",  // 1.000.000 AOA
+        maxAmount: "10000000.00", // 10.000.000 AOA
         minTerm: 12,
         maxTerm: 36,
-        interestRate: 15.0,  // 15% ao ano
-        effortRate: 40.0,    // Taxa de esforço máxima 40%
-        processingFee: 3.0,  // Taxa de processamento 3%
+        interestRate: "15.00",  // 15% ao ano
+        effortRate: "40.00",    // Taxa de esforço máxima 40%
+        processingFee: "3.00",  // Taxa de processamento 3%
         isActive: true,
         requirements: [
           "Certificado de posse de terreno",
@@ -78,13 +78,13 @@ export async function seedCreditPrograms() {
         name: "Jovem Agricultor",
         description: "Programa dedicado a jovens empreendedores agrícolas entre 18-35 anos. Condições especiais para incentivar a juventude no setor agrícola.",
         projectTypes: ["corn", "cassava", "horticulture", "poultry"],
-        minAmount: 100000,   // 100.000 AOA
-        maxAmount: 2000000,  // 2.000.000 AOA
+        minAmount: "100000.00",   // 100.000 AOA
+        maxAmount: "2000000.00",  // 2.000.000 AOA
         minTerm: 6,
         maxTerm: 18,
-        interestRate: 10.0,  // 10% ao ano
-        effortRate: 30.0,    // Taxa de esforço máxima 30% (condições preferenciais)
-        processingFee: 1.5,  // Taxa de processamento reduzida 1,5%
+        interestRate: "10.00",  // 10% ao ano
+        effortRate: "30.00",    // Taxa de esforço máxima 30% (condições preferenciais)
+        processingFee: "1.50",  // Taxa de processamento reduzida 1,5%
         isActive: true,
         requirements: [
           "Idade entre 18 e 35 anos",
@@ -105,13 +105,13 @@ export async function seedCreditPrograms() {
         name: "Horticultura Comercial",
         description: "Financiamento para projetos de horticultura com foco na produção comercial e abastecimento dos mercados urbanos.",
         projectTypes: ["horticulture"],
-        minAmount: 150000,   // 150.000 AOA
-        maxAmount: 3000000,  // 3.000.000 AOA
+        minAmount: "150000.00",   // 150.000 AOA
+        maxAmount: "3000000.00",  // 3.000.000 AOA
         minTerm: 6,
         maxTerm: 15,
-        interestRate: 13.5,  // 13,5% ao ano
-        effortRate: 35.0,    // Taxa de esforço máxima 35%
-        processingFee: 2.0,  // Taxa de processamento 2%
+        interestRate: "13.50",  // 13,5% ao ano
+        effortRate: "35.00",    // Taxa de esforço máxima 35%
+        processingFee: "2.00",  // Taxa de processamento 2%
         isActive: true,
         requirements: [
           "Acesso garantido à água",
@@ -131,13 +131,13 @@ export async function seedCreditPrograms() {
         name: "Avicultura Moderna",
         description: "Programa para modernização e expansão de projetos avícolas, incluindo galinhas poedeiras e frangos de carne.",
         projectTypes: ["poultry"],
-        minAmount: 300000,   // 300.000 AOA
-        maxAmount: 4000000,  // 4.000.000 AOA
+        minAmount: "300000.00",   // 300.000 AOA
+        maxAmount: "4000000.00",  // 4.000.000 AOA
         minTerm: 9,
         maxTerm: 24,
-        interestRate: 14.0,  // 14% ao ano
-        effortRate: 38.0,    // Taxa de esforço máxima 38%
-        processingFee: 2.5,  // Taxa de processamento 2,5%
+        interestRate: "14.00",  // 14% ao ano
+        effortRate: "38.00",    // Taxa de esforço máxima 38%
+        processingFee: "2.50",  // Taxa de processamento 2,5%
         isActive: false,     // Programa temporariamente suspenso
         requirements: [
           "Instalações adequadas",

@@ -38,7 +38,7 @@ export const profilePermissions = pgTable("profile_permissions", {
 });
 
 // Users table
-export const users: any = pgTable("users", {
+export const users = pgTable("users", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   fullName: varchar("full_name", { length: 255 }).notNull(),
   bi: varchar("bi", { length: 50 }).notNull().unique(), // Bilhete de Identidade
@@ -68,6 +68,8 @@ export const creditPrograms = pgTable("credit_programs", {
   interestRate: decimal("interest_rate", { precision: 5, scale: 2 }).notNull(), // Annual interest rate percentage
   effortRate: decimal("effort_rate", { precision: 5, scale: 2 }).notNull(), // Maximum effort rate (payment/income ratio) percentage
   processingFee: decimal("processing_fee", { precision: 5, scale: 2 }).default("0"), // Processing fee percentage
+  requirements: text("requirements").array().default(sql`ARRAY[]::text[]`), // Program requirements
+  benefits: text("benefits").array().default(sql`ARRAY[]::text[]`), // Program benefits
   isActive: boolean("is_active").default(true),
   createdAt: timestamp("created_at").defaultNow(),
   updatedAt: timestamp("updated_at").defaultNow(),
@@ -147,7 +149,6 @@ export const insertCreditApplicationSchema = createInsertSchema(creditApplicatio
   id: true,
   createdAt: true,
   updatedAt: true,
-  status: true,
   rejectionReason: true,
   interestRate: true,
 });

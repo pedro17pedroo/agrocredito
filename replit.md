@@ -35,6 +35,8 @@ Preferred communication style: Simple, everyday language.
   - ✅ **API Multi-tenant**: Endpoints `/api/financial-users/*` criados com segurança por instituição
   - ✅ **Schema atualizado**: Campo `parentInstitutionId` adicionado para suporte multi-tenant
   - ✅ **Interface completa**: Componente de gestão com tabs para equipa interna e clientes, formulários de criação/edição
+  - ✅ **Seeds atualizados**: Dados de teste ajustados com segregação de instituições financeiras
+  - ✅ **Base de dados populada**: 23 permissões, 5 perfis, 3 utilizadores, 5 solicitações, 5 programas de crédito e 1 conta de teste criados
 
 - **July 27, 2025**: **PROJETO COMPLETO E FUNCIONANDO EM PRODUÇÃO** 🎉
   - ✅ **100% do PRD implementado**: Todos os 10 requisitos funcionais e 8 não-funcionais atendidos
