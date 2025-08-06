@@ -69,16 +69,17 @@ export function registerRoutes(app: Express): Server {
 
   // Add credit simulator as a public route
   app.post("/api/simulate-credit", async (req, res) => {
-    const { amount, term, projectType, creditProgramId } = req.body;
+    const { amount, term, projectType, monthlyIncome, creditProgramId } = req.body;
 
-    if (!amount || !term) {
-      return res.status(400).json({ message: "Amount and term are required" });
+    if (!amount || !term || !monthlyIncome) {
+      return res.status(400).json({ message: "Amount, term, and monthly income are required" });
     }
 
     let interestRate = 15; // Default base rate
+    let effortRate = 30; // Default effort rate percentage
 
     try {
-      // If a specific credit program is selected, use its interest rate
+      // If a specific credit program is selected, use its interest rate and effort rate
       if (creditProgramId) {
         const { db } = await import("../db.js");
         const { creditPrograms } = await import("../../shared/schema.js");
@@ -92,6 +93,7 @@ export function registerRoutes(app: Express): Server {
 
         if (program.length > 0) {
           interestRate = parseFloat(program[0].interestRate);
+          effortRate = parseFloat(program[0].effortRate);
         }
       } else {
         // Fallback: Base interest rate calculation based on project type
@@ -106,20 +108,34 @@ export function registerRoutes(app: Express): Server {
         interestRate = 15 + (rateAdjustments[projectType] || 0);
       }
 
+      // Calculate monthly payment based on interest rate
       const monthlyRate = interestRate / 100 / 12;
-      const monthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) / 
-                            (Math.pow(1 + monthlyRate, term) - 1);
+      const calculatedMonthlyPayment = (amount * monthlyRate * Math.pow(1 + monthlyRate, term)) / 
+                                      (Math.pow(1 + monthlyRate, term) - 1);
 
+      // Apply effort rate constraint
+      const maxMonthlyPayment = (monthlyIncome * effortRate) / 100;
+      const isEffortRateViolated = calculatedMonthlyPayment > maxMonthlyPayment;
+      
+      // Final monthly payment (respecting effort rate)
+      const monthlyPayment = Math.min(calculatedMonthlyPayment, maxMonthlyPayment);
+      
       const totalAmount = monthlyPayment * term;
       const totalInterest = totalAmount - amount;
+      const effortRatePercentage = (monthlyPayment / monthlyIncome) * 100;
 
       res.json({
         amount: parseFloat(amount),
         term: parseInt(term),
+        monthlyIncome: parseFloat(monthlyIncome),
         interestRate: parseFloat(interestRate.toFixed(2)),
+        effortRate: parseFloat(effortRate.toFixed(2)),
         monthlyPayment: Math.round(monthlyPayment * 100) / 100,
         totalAmount: Math.round(totalAmount * 100) / 100,
         totalInterest: Math.round(totalInterest * 100) / 100,
+        effortRatePercentage: Math.round(effortRatePercentage * 100) / 100,
+        isEffortRateViolated: isEffortRateViolated,
+        maxMonthlyPayment: Math.round(maxMonthlyPayment * 100) / 100,
         creditProgramId: creditProgramId || null,
       });
     } catch (error) {

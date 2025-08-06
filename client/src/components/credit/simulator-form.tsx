@@ -17,6 +17,7 @@ const simulatorSchema = z.object({
   amount: z.string().min(1, "Montante é obrigatório"),
   term: z.string().min(1, "Prazo é obrigatório"),
   projectType: z.enum(["corn", "cassava", "cattle", "poultry", "horticulture", "other"]),
+  monthlyIncome: z.string().min(1, "Rendimento mensal é obrigatório"),
 });
 
 type SimulatorForm = z.infer<typeof simulatorSchema>;
@@ -26,6 +27,11 @@ interface SimulationResult {
   totalAmount: number;
   interestRate: number;
   totalInterest: number;
+  monthlyIncome: number;
+  effortRate: number;
+  effortRatePercentage: number;
+  isEffortRateViolated: boolean;
+  maxMonthlyPayment: number;
 }
 
 interface CreditProgram {
@@ -55,6 +61,7 @@ export default function SimulatorForm() {
       amount: "AOA 5,000,000",
       term: "36",
       projectType: "corn",
+      monthlyIncome: "",
     },
   });
 
@@ -64,6 +71,7 @@ export default function SimulatorForm() {
         amount: parseKwanza(data.amount),
         term: parseInt(data.term),
         projectType: data.projectType,
+        monthlyIncome: parseKwanza(data.monthlyIncome),
         creditProgramId: selectedProgram || undefined,
       };
       
@@ -210,6 +218,36 @@ export default function SimulatorForm() {
               )}
             />
             
+            <FormField
+              control={form.control}
+              name="monthlyIncome"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="form-label">Rendimento Mensal</FormLabel>
+                  <FormControl>
+                    <Input
+                      {...field}
+                      className="form-input text-2xl font-bold"
+                      placeholder="AOA 500,000"
+                      onChange={(e) => {
+                        const value = e.target.value;
+                        const numericValue = value.replace(/[^0-9]/g, '');
+                        if (numericValue) {
+                          field.onChange(formatKwanza(parseInt(numericValue)));
+                        } else {
+                          field.onChange('');
+                        }
+                      }}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                  <p className="text-sm text-gray-600">
+                    O seu rendimento mensal será usado para calcular a taxa de esforço máxima permitida
+                  </p>
+                </FormItem>
+              )}
+            />
+            
             <Button 
               type="submit" 
               disabled={simulate.isPending}
@@ -230,7 +268,18 @@ export default function SimulatorForm() {
               <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
                 <p className="text-sm text-orange-800">
                   <strong>Programa:</strong> {selectedProgramData.name} - 
-                  <strong> Taxa aplicada:</strong> {selectedProgramData.interestRate}% a.a.
+                  <strong> Taxa aplicada:</strong> {selectedProgramData.interestRate}% a.a. - 
+                  <strong> Taxa de esforço máx:</strong> {selectedProgramData.effortRate}%
+                </p>
+              </div>
+            )}
+            
+            {/* Effort Rate Warning */}
+            {result.isEffortRateViolated && (
+              <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg">
+                <p className="text-sm text-red-800">
+                  <strong>⚠️ Aviso:</strong> A prestação calculada ({formatKwanza(result.maxMonthlyPayment + 1)}) excede a taxa de esforço máxima.
+                  O valor foi ajustado para {formatKwanza(result.maxMonthlyPayment)} (máx. {result.effortRate}% do rendimento).
                 </p>
               </div>
             )}
@@ -241,6 +290,9 @@ export default function SimulatorForm() {
                   {formatKwanza(result.monthlyPayment)}
                 </div>
                 <div className="text-sm text-gray-600">Prestação Mensal</div>
+                <div className="text-xs text-gray-500 mt-1">
+                  {result.effortRatePercentage.toFixed(1)}% do rendimento
+                </div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-agri-secondary">
@@ -255,9 +307,37 @@ export default function SimulatorForm() {
                 <div className="text-sm text-gray-600">Taxa de Juro</div>
               </div>
             </div>
-            <div className="mt-4 text-center">
-              <div className="text-lg text-gray-700">
-                <strong>Juros totais:</strong> {formatKwanza(result.totalInterest)}
+            
+            <div className="mt-4 grid sm:grid-cols-2 gap-4 text-center">
+              <div>
+                <div className="text-lg text-gray-700">
+                  <strong>Juros totais:</strong> {formatKwanza(result.totalInterest)}
+                </div>
+              </div>
+              <div>
+                <div className="text-lg text-gray-700">
+                  <strong>Rendimento declarado:</strong> {formatKwanza(result.monthlyIncome)}
+                </div>
+              </div>
+            </div>
+            
+            {/* Effort Rate Bar */}
+            <div className="mt-4 p-3 bg-gray-50 rounded-lg">
+              <div className="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Taxa de Esforço Atual</span>
+                <span>{result.effortRatePercentage.toFixed(1)}% / {result.effortRate}%</span>
+              </div>
+              <div className="w-full bg-gray-200 rounded-full h-3">
+                <div 
+                  className={`h-3 rounded-full transition-all ${
+                    result.effortRatePercentage > result.effortRate 
+                      ? 'bg-red-500' 
+                      : result.effortRatePercentage > result.effortRate * 0.8 
+                        ? 'bg-yellow-500' 
+                        : 'bg-green-500'
+                  }`}
+                  style={{ width: `${Math.min((result.effortRatePercentage / result.effortRate) * 100, 100)}%` }}
+                ></div>
               </div>
             </div>
           </div>
