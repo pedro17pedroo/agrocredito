@@ -64,20 +64,26 @@ export default function FinancialInstitutionSelector({
 
   // Filter programs based on selection and project type
   useEffect(() => {
-    let programs = selectedInstitution ? institutionPrograms : allPrograms;
+    let programs: CreditProgram[] = selectedInstitution ? 
+      (institutionPrograms as CreditProgram[]) : 
+      (allPrograms as CreditProgram[]);
     
-    if (projectType && programs.length > 0) {
+    if (projectType && programs && programs.length > 0) {
       programs = programs.filter((program: CreditProgram) => 
         program.projectTypes.includes(projectType) || program.projectTypes.includes("other")
       );
     }
     
-    setFilteredPrograms(programs);
+    setFilteredPrograms(programs || []);
   }, [selectedInstitution, institutionPrograms, allPrograms, projectType]);
 
   const handleProgramChange = (programId: string) => {
-    const program = filteredPrograms.find(p => p.id === programId);
-    onProgramChange(programId, program);
+    if (programId === "none") {
+      onProgramChange("", undefined);
+    } else {
+      const program = filteredPrograms.find(p => p.id === programId);
+      onProgramChange(programId, program);
+    }
   };
 
   const getProjectTypeLabel = (type: string) => {
@@ -117,7 +123,7 @@ export default function FinancialInstitutionSelector({
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos os programas de crédito</SelectItem>
-                  {institutions.map((institution: FinancialInstitution) => (
+                  {(institutions as FinancialInstitution[]).map((institution: FinancialInstitution) => (
                     <SelectItem key={institution.id} value={institution.id}>
                       {institution.fullName}
                     </SelectItem>
@@ -130,7 +136,7 @@ export default function FinancialInstitutionSelector({
               <div className="p-3 bg-agri-light/10 rounded-lg">
                 <p className="text-sm text-agri-dark">
                   <strong>Instituição Selecionada:</strong>{" "}
-                  {institutions.find((i: FinancialInstitution) => i.id === selectedInstitution)?.fullName}
+                  {(institutions as FinancialInstitution[]).find((i: FinancialInstitution) => i.id === selectedInstitution)?.fullName}
                 </p>
               </div>
             )}

@@ -224,6 +224,17 @@ export default function SimulatorForm() {
         {result && (
           <div className="mt-8 p-6 bg-agri-light rounded-xl border-l-4 border-agri-primary">
             <h3 className="text-xl font-bold text-agri-dark mb-4">Resultado da Simulação</h3>
+            
+            {/* Program Info */}
+            {selectedProgramData && (
+              <div className="mb-4 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <p className="text-sm text-orange-800">
+                  <strong>Programa:</strong> {selectedProgramData.name} - 
+                  <strong> Taxa aplicada:</strong> {selectedProgramData.interestRate}% a.a.
+                </p>
+              </div>
+            )}
+            
             <div className="grid sm:grid-cols-3 gap-4">
               <div className="text-center">
                 <div className="text-2xl font-bold text-agri-primary">
