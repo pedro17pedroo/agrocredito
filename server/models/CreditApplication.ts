@@ -1,6 +1,6 @@
 import { eq, desc, and } from "drizzle-orm";
-import { db } from "../db";
-import { creditApplications, type CreditApplication, type InsertCreditApplication } from "@shared/schema";
+import { db } from "../db.js";
+import { creditApplications, users, type CreditApplication, type InsertCreditApplication } from "../../shared/schema.js";
 
 export class CreditApplicationModel {
   static async findById(id: string): Promise<CreditApplication | undefined> {
@@ -58,14 +58,66 @@ export class CreditApplicationModel {
     historical: CreditApplication[];
   }> {
     const newApplications = await db
-      .select()
+      .select({
+        id: creditApplications.id,
+        userId: creditApplications.userId,
+        creditProgramId: creditApplications.creditProgramId,
+        projectName: creditApplications.projectName,
+        projectType: creditApplications.projectType,
+        description: creditApplications.description,
+        amount: creditApplications.amount,
+        term: creditApplications.term,
+        interestRate: creditApplications.interestRate,
+        status: creditApplications.status,
+        rejectionReason: creditApplications.rejectionReason,
+        reviewedBy: creditApplications.reviewedBy,
+        approvedBy: creditApplications.approvedBy,
+        documents: creditApplications.documents,
+        documentTypes: creditApplications.documentTypes,
+        createdAt: creditApplications.createdAt,
+        updatedAt: creditApplications.updatedAt,
+        user: {
+          id: users.id,
+          fullName: users.fullName,
+          phone: users.phone,
+          email: users.email,
+          userType: users.userType,
+        }
+      })
       .from(creditApplications)
+      .leftJoin(users, eq(creditApplications.userId, users.id))
       .where(eq(creditApplications.status, "pending"))
       .orderBy(desc(creditApplications.createdAt));
 
     const underReviewApplications = await db
-      .select()
+      .select({
+        id: creditApplications.id,
+        userId: creditApplications.userId,
+        creditProgramId: creditApplications.creditProgramId,
+        projectName: creditApplications.projectName,
+        projectType: creditApplications.projectType,
+        description: creditApplications.description,
+        amount: creditApplications.amount,
+        term: creditApplications.term,
+        interestRate: creditApplications.interestRate,
+        status: creditApplications.status,
+        rejectionReason: creditApplications.rejectionReason,
+        reviewedBy: creditApplications.reviewedBy,
+        approvedBy: creditApplications.approvedBy,
+        documents: creditApplications.documents,
+        documentTypes: creditApplications.documentTypes,
+        createdAt: creditApplications.createdAt,
+        updatedAt: creditApplications.updatedAt,
+        user: {
+          id: users.id,
+          fullName: users.fullName,
+          phone: users.phone,
+          email: users.email,
+          userType: users.userType,
+        }
+      })
       .from(creditApplications)
+      .leftJoin(users, eq(creditApplications.userId, users.id))
       .where(and(
         eq(creditApplications.status, "under_review"),
         eq(creditApplications.reviewedBy, financialInstitutionId)
@@ -73,8 +125,34 @@ export class CreditApplicationModel {
       .orderBy(desc(creditApplications.updatedAt));
 
     const historicalApplications = await db
-      .select()
+      .select({
+        id: creditApplications.id,
+        userId: creditApplications.userId,
+        creditProgramId: creditApplications.creditProgramId,
+        projectName: creditApplications.projectName,
+        projectType: creditApplications.projectType,
+        description: creditApplications.description,
+        amount: creditApplications.amount,
+        term: creditApplications.term,
+        interestRate: creditApplications.interestRate,
+        status: creditApplications.status,
+        rejectionReason: creditApplications.rejectionReason,
+        reviewedBy: creditApplications.reviewedBy,
+        approvedBy: creditApplications.approvedBy,
+        documents: creditApplications.documents,
+        documentTypes: creditApplications.documentTypes,
+        createdAt: creditApplications.createdAt,
+        updatedAt: creditApplications.updatedAt,
+        user: {
+          id: users.id,
+          fullName: users.fullName,
+          phone: users.phone,
+          email: users.email,
+          userType: users.userType,
+        }
+      })
       .from(creditApplications)
+      .leftJoin(users, eq(creditApplications.userId, users.id))
       .where(eq(creditApplications.reviewedBy, financialInstitutionId))
       .orderBy(desc(creditApplications.updatedAt));
 

@@ -33,6 +33,8 @@ interface CreditApplication {
   rejectionReason?: string;
   reviewedBy?: string;
   approvedBy?: string;
+  documents?: string[];
+  documentTypes?: string[];
   createdAt: string;
   updatedAt: string;
   user?: {
@@ -40,6 +42,7 @@ interface CreditApplication {
     fullName: string;
     phone: string;
     email: string;
+    userType: string;
   };
 }
 
@@ -557,6 +560,95 @@ export default function CreditApplicationsView() {
                   <Separator />
                 </>
               )}
+
+              {/* Documents Section */}
+              <div>
+                <h4 className="font-medium mb-2">Documentos Submetidos</h4>
+                {selectedApplication.documents && selectedApplication.documents.length > 0 ? (
+                  <div className="space-y-3">
+                    {selectedApplication.documents.map((docUrl, index) => {
+                      const docType = selectedApplication.documentTypes?.[index] || `Documento ${index + 1}`;
+                      const fileName = docUrl.split('/').pop() || docUrl;
+                      
+                      return (
+                        <div key={index} className="flex items-center justify-between p-3 border rounded-lg bg-gray-50">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-lg flex items-center justify-center">
+                              <svg className="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                            <div>
+                              <p className="font-medium text-sm">{docType}</p>
+                              <p className="text-xs text-gray-500">{fileName}</p>
+                            </div>
+                          </div>
+                          <div className="flex gap-2">
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => window.open(docUrl, '_blank')}
+                            >
+                              <Eye className="h-4 w-4 mr-1" />
+                              Ver
+                            </Button>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const link = document.createElement('a');
+                                link.href = docUrl;
+                                link.download = fileName;
+                                link.click();
+                              }}
+                            >
+                              <svg className="h-4 w-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                              </svg>
+                              Baixar
+                            </Button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Document Requirements Info */}
+                    <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <h5 className="font-medium text-blue-900 mb-2">Documentos Obrigatórios para Verificação:</h5>
+                      <div className="text-sm text-blue-800">
+                        {selectedApplication.user?.userType === 'farmer' ? (
+                          <ul className="list-disc ml-4 space-y-1">
+                            <li>Bilhete de Identidade (cópia)</li>
+                            <li>Comprovativo de Residência</li>
+                            <li>Declaração de Rendimentos</li>
+                            <li>Plano de Negócio do Projeto Agrícola</li>
+                            <li>Comprovativo de Posse/Uso da Terra</li>
+                          </ul>
+                        ) : (
+                          <ul className="list-disc ml-4 space-y-1">
+                            <li>Certidão Comercial da Empresa</li>
+                            <li>NIF da Empresa</li>
+                            <li>Estatutos da Empresa</li>
+                            <li>Demonstrações Financeiras (2 anos)</li>
+                            <li>Plano de Negócio Detalhado</li>
+                            <li>Comprovativo de Licenciamento</li>
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="p-4 text-center text-gray-500 border border-dashed border-gray-300 rounded-lg">
+                    <svg className="w-8 h-8 mx-auto mb-2 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <p>Nenhum documento foi submetido</p>
+                    <p className="text-xs">O cliente deve submeter os documentos obrigatórios</p>
+                  </div>
+                )}
+              </div>
+
+              <Separator />
 
               <div>
                 <h4 className="font-medium mb-2">Estado Atual</h4>
