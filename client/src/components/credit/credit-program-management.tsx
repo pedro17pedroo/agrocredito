@@ -109,7 +109,7 @@ export default function CreditProgramManagement() {
   // Create program mutation
   const createProgram = useMutation({
     mutationFn: async (data: ProgramForm) => {
-      return apiRequest("/api/credit-programs", "POST", data);
+      return apiRequest("POST", "/api/credit-programs", data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/credit-programs"] });
@@ -132,7 +132,7 @@ export default function CreditProgramManagement() {
   // Update program mutation
   const updateProgram = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: ProgramForm }) => {
-      return apiRequest(`/api/credit-programs/${id}`, "PUT", data);
+      return apiRequest("PUT", `/api/credit-programs/${id}`, data);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/credit-programs"] });
@@ -156,7 +156,7 @@ export default function CreditProgramManagement() {
   // Delete program mutation
   const deleteProgram = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/credit-programs/${id}`, "DELETE");
+      return apiRequest("DELETE", `/api/credit-programs/${id}`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/credit-programs"] });
@@ -177,7 +177,7 @@ export default function CreditProgramManagement() {
   // Toggle active status mutation
   const toggleActiveStatus = useMutation({
     mutationFn: async (id: string) => {
-      return apiRequest(`/api/credit-programs/${id}/toggle-status`, "PATCH");
+      return apiRequest("PATCH", `/api/credit-programs/${id}/toggle-status`);
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/credit-programs"] });
