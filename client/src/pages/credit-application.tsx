@@ -73,7 +73,7 @@ export default function CreditApplication() {
       projectType: "corn",
       description: "",
       amount: "",
-      term: "12",
+      term: "12", // Keep as string for form compatibility
       productivity: "small",
       agricultureType: "",
       creditDeliveryMethod: "total",
@@ -100,7 +100,7 @@ export default function CreditApplication() {
         projectType: data.projectType,
         description: data.description,
         amount: parseKwanza(data.amount).toString(),
-        term: data.term,
+        term: Number(data.term), // Ensure term is a number
         productivity: data.productivity,
         agricultureType: data.agricultureType,
         creditDeliveryMethod: data.creditDeliveryMethod,
