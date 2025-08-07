@@ -440,7 +440,7 @@ export default function CreditApplication() {
                     render={({ field }) => (
                       <FormItem>
                         <FormLabel className="form-label">Prazo (meses)</FormLabel>
-                        <Select onValueChange={(value) => field.onChange(parseInt(value))} defaultValue={field.value?.toString()}>
+                        <Select onValueChange={field.onChange} value={field.value}>
                           <FormControl>
                             <SelectTrigger className="form-input">
                               <SelectValue placeholder="Selecione o prazo" />
