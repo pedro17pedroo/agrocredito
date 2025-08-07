@@ -83,16 +83,16 @@ export default function CreditApplication() {
 
   const createApplication = useMutation({
     mutationFn: async (data: ApplicationForm) => {
-      // TODO: Validate required documents (disabled temporarily until file upload is implemented)
-      // if (user && ['farmer', 'company', 'cooperative'].includes(user.userType)) {
-      //   const userType = user.userType as 'farmer' | 'company' | 'cooperative';
-      //   const requiredDocs = getRequiredDocuments(userType).filter(doc => doc.required);
-      //   const missingDocs = requiredDocs.filter(doc => !documents[doc.id]);
-      //   
-      //   if (missingDocs.length > 0) {
-      //     throw new Error(`Documentos obrigatórios em falta: ${missingDocs.map(d => d.name).join(', ')}`);
-      //   }
-      // }
+      // Validate required documents
+      if (user && ['farmer', 'company', 'cooperative'].includes(user.userType)) {
+        const userType = user.userType as 'farmer' | 'company' | 'cooperative';
+        const requiredDocs = getRequiredDocuments(userType).filter(doc => doc.required);
+        const missingDocs = requiredDocs.filter(doc => !documents[doc.id]);
+        
+        if (missingDocs.length > 0) {
+          throw new Error(`Documentos obrigatórios em falta: ${missingDocs.map(d => d.name).join(', ')}`);
+        }
+      }
 
       // For now, send JSON data (file upload will be handled separately)
       const payload = {
@@ -460,23 +460,6 @@ export default function CreditApplication() {
                   />
                 </div>
 
-                <div className="flex gap-4 pt-6">
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={() => setLocation("/dashboard")}
-                    className="flex-1"
-                  >
-                    Cancelar
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createApplication.isPending}
-                    className="flex-1 bg-agri-primary hover:bg-agri-dark"
-                  >
-                    {createApplication.isPending ? "Enviando..." : "Enviar Solicitação"}
-                  </Button>
-                </div>
                 </form>
               </Form>
             </CardContent>
@@ -490,6 +473,30 @@ export default function CreditApplication() {
               onDocumentChange={handleDocumentChange}
             />
           )}
+
+          {/* Submit/Cancel Buttons - Moved to the end */}
+          <Card>
+            <CardContent className="p-6">
+              <div className="flex gap-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setLocation("/dashboard")}
+                  className="flex-1"
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="button"
+                  disabled={createApplication.isPending}
+                  onClick={form.handleSubmit(onSubmit)}
+                  className="flex-1 bg-agri-primary hover:bg-agri-dark"
+                >
+                  {createApplication.isPending ? "Enviando..." : "Enviar Solicitação"}
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
